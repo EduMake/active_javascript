@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <title>Javascript : Area Calc Simulation</title>
+        <link href="css/main.css" rel="stylesheet" type="text/css" media="all">
+        <style>
+            #feditor {
+                height: 20em;
+            }
+        </style>        
+    </head>
+    <body>
+        <header>
+        
+        <h1>Active Javascript</h1>
+    
+        <div id="tincanid">
+            <label for="tincanemail">School Email Address</label> <input type="email" id="tincanemail" />
+            <button id="save">Save</button>
+        </div>
+        </header>
+        
+        <div id="workspace">
+            <pre id="editor"></pre>
+            <button id="run">Run</button>
+        
+        </div>
+        <div id="task"></div>
+        <div id="exercises">
+            <h3>Exercises</h3>
+            <nav  >
+                <ul id="exercise_list">
+                </ul>
+            </nav>
+        </div>
+        <div id="simulationbox">
+            <h2>Result</h2>
+            <div id="simulation"></div>
+        </div>
+        <div id="tests">
+            <h2>Test Results</h2>
+            <ul id="testoutput"></ul> 
+            <h3 id="result"></h3>
+        </div>
+        
+        
+        <script src="external/jquery-1.11.0.min.js"></script>
+        <script src="external/TinCanJS/build/tincan-min.js"></script>
+        <script src="js/tincan_config.js"></script>
+        <script src="external/ace-builds/src-noconflict/ace.js" charset="utf-8"></script>
+        <script src="js/exercise_base.js" charset="utf-8"></script>
+
+        <script>
+            var editor = ace.edit("editor");
+            editor.setTheme("ace/theme/dawn");
+            editor.getSession().setMode("ace/mode/javascript");
+            editor.setWrapBehavioursEnabled(true);
+            editor.setFontSize(16);
+            editor.setShowPrintMargin(false);
+        </script>
+    </body>
+</html>
