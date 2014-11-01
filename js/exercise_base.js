@@ -1,6 +1,8 @@
 
 var iTestCount = 0;
 var iTestSuccesses = 0;
+var intervalID = 0;
+var currentExercise = 0;
 
 
 function assert( outcome, description ) {
@@ -17,9 +19,11 @@ function assert( outcome, description ) {
 } 
 
 $( document ).ready(function() {
+        
+    
    
     var findExercise = function(sExerciseHash) {
-        var iExercise = aExercises.findIndex(function isPrime(element, index, array) {
+        var iExercise = aExercises.findIndex(function(element, index, array) {
             return sExerciseHash === element.folder;
         });
         
@@ -29,9 +33,27 @@ $( document ).ready(function() {
         return iExercise;
     };
     
-    $.ajaxSetup( {cache:false} )
+    $.ajaxSetup( {cache:false} );
+    
+    $("#reset").click(function(){
+        var sExerciseHash = window.location.hash.replace("#","");
+        var iExercise = findExercise(sExerciseHash);
+        setExercise(iExercise, true);
+    });
+    
+    $("#reload").click(function(){
+        var sExerciseHash = window.location.hash.replace("#","");
+        var iExercise = findExercise(sExerciseHash);
+        setExercise(iExercise);
+    });
         
-    var setExercise = function(currExercise) {
+    var setExercise = function(iX, force) {
+        currExercise = aExercises[iX];
+        currentExercise = iX;
+        if(typeof force === "undefined") {
+            force = false;
+        }
+        
         $("title").text("Active Javascript : " + currExercise.name);
         $("h1").text("Active Javascript : " + currExercise.name);
         $("#task").load("exercises/"+currExercise.folder+"/task.html");    
@@ -39,20 +61,34 @@ $( document ).ready(function() {
         $("#output").html("");
         $("#testoutput").html("");
         $("#result").html("");
+        $("#next").hide();
         
-        $.get("exercises/"+currExercise.folder+"/initial.js", {}, function(data){
-             editor.setValue(data); // or session.setValue
-             editor.clearSelection();//gotoLine(0);
-        }, "html");
-        
+        var sStored = localStorage.getItem("code_"+currExercise.folder);
+        console.log("sStored =", sStored);
+        if(sStored && !force)
+        {
+             editor.setValue(sStored); // or session.setValue
+             editor.navigateFileStart();
+            
+        } else {
+            $.get("exercises/"+currExercise.folder+"/initial.js", {}, function(data){   
+                 editor.setValue(data); // or session.setValue
+                 editor.navigateFileStart();
+            }, "html");
+        }
         $("#run").off("click").click(function(){
             $("#output").html("");
             $("#testoutput").html("");
             $("#result").html("");
             
+            var sExerciseHash = window.location.hash.replace("#","");
+            var code = editor.getValue();
+            localStorage.setItem("code_"+sExerciseHash, code);
+    
             $.get("exercises/"+currExercise.folder+"/tests.js", {}, function(testscript){
                     
                 $.get("exercises/"+currExercise.folder+"/context.js", {}, function(contextscript){
+                    window.clearInterval(intervalID);
                     var newcode = editor.getValue();
                     
                     script = "iTestSuccesses = 0;\niTestCount = 0;\n\n";
@@ -82,9 +118,25 @@ $( document ).ready(function() {
                         //console.log("endStatement =", endStatement);
                         if(defaultStatement.actor.mbox.length) {
                             tincan.sendStatement(endStatement);
-                        }                
+                        }             
                         
-                        $("#result").html("Well done. Your code passed all the tests.");
+                        var sExtra = "";
+                        var next = currentExercise + 1;
+                        console.log("next =", next);
+                        if(next < aExercises.length) {
+                            //sExtra = "<a href='#"+aExercises[next].folder+"'>Next</a>";
+                            var newHash = "#"+aExercises[next].folder;
+                            $("#next").attr("href", newHash);
+                            
+                            $("#next").off("click").click(function(){
+                                 setExercise(next);
+                            }).show();
+                            
+                        } else if (next === aExercises.length) {
+                            sExtra = "<h2>You have finished</h2>"
+                        }
+                        
+                        $("#result").html("Well done. Your code passed all the tests.<br>"+sExtra);
                     } else {
                         $("#result").html("Please Try Again : Check the test results to work out what to do.");
                     
@@ -124,13 +176,13 @@ $( document ).ready(function() {
     listitems.off("click").click(function(){
         var parts = this.href.split("#");
         var iNew = findExercise(parts[1]);
-        setExercise(aExercises[iNew]);
+        setExercise(iNew);
     });
     
     var sExerciseHash = window.location.hash.replace("#","");
     
     var iExercise = findExercise(sExerciseHash);
-    setExercise(aExercises[iExercise]);
+    setExercise(iExercise);
     
     var field = document.getElementById("tincanemail");
     
@@ -144,15 +196,15 @@ $( document ).ready(function() {
     });    
     
     tincan = new TinCan (
-           {
-                recordStores: [{
-                    endpoint: "http://lrs.edumake.org/data/xAPI/",
-                    username: "77d48e666c68b18b8817bcdfbec4363d3571730b",
-                    password: "a26c0ce065135e5ac08fc2a3161546bf069c282f",
-                    allowFail: false
-                }]
-            }
-        );
+        {
+            recordStores: [{
+                endpoint: "http://lrs.edumake.org/data/xAPI/",
+                username: "77d48e666c68b18b8817bcdfbec4363d3571730b",
+                password: "a26c0ce065135e5ac08fc2a3161546bf069c282f",
+                allowFail: false
+            }]
+        }
+    );
  
     
     
