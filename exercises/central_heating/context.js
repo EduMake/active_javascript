@@ -1,6 +1,7 @@
 
 function INPUT(ControlName) {
     return $("#" + ControlName).val();
+    
 }
 
 function OUTPUT(Out, Val) {
@@ -62,19 +63,19 @@ function main(){
   intervalID = window.setInterval(_loop, 1000);
 }
 
-function run() {
-    $("#output").html("");
-    main();
-}
 
 function stop(){
     window.clearInterval(intervalID);
 }
 
-
-$( document ).ready(function() {
-    $("#start").click(run);
-    $("#stop").click(stop);
+function run() {
+    stop();
+    $("#output").html("");
     main();
-});
+}
+
+
+$("#start").click(run);
+$("#stop").click(stop);
+main();
 
