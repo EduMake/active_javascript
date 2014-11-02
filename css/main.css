@@ -16,12 +16,14 @@ body {
     float: right;
     width: 38%;
 }
-#task {
+#taskbox {
     background: none repeat scroll 0 0 #eeffee;
     border-radius: 4px 4px 0;
     float: right;
     width: 38%;
 }
+
+
 h1 {
     float: left;
     min-width: 60%;
@@ -73,4 +75,8 @@ h1 {
     content: "FAIL: ";
     font-weight: bold;
 }
+#next{
+    font-weight: bold;
+    font-size: 1.8em;
 
+}
