@@ -1,0 +1,6 @@
+[submodule "external/TinCanJS"]
+	path = external/TinCanJS
+	url = https://github.com/RusticiSoftware/TinCanJS.git
+[submodule "external/ace-builds"]
+	path = external/ace-builds
+	url = https://github.com/ajaxorg/ace-builds.git

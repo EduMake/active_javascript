@@ -1,8 +1,8 @@
 var TinCanRecordStores = [
-    {
+    {//EduMake Usage Tracking : Please leave in place so we can review performance but remove if you wish
         endpoint: "http://lrs.edumake.org/data/xAPI/",
-        username: "77d48e666c68b18b8817bcdfbec4363d3571730b",
-        password: "a26c0ce065135e5ac08fc2a3161546bf069c282f",
-        allowFail: false
+        username: "4b8f7daaa666f6241185a324d2fabe4b28abbc15",
+        password: "efae1c21d96b49d5a957a7ac6e56c4fdd5b88af1",
+        allowFail: true
     }
 ];
