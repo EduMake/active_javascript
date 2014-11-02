@@ -6,7 +6,9 @@ function getAreaOfTriangle(Base, Height) {
   return Base * Height;
 }
 
-var Base = INPUT("base");
-var Height = INPUT("height");
-OUTPUT("Area of a " + Base + " x " + Height + " rectangle = " + getAreaOfRectangle(Base, Height));
-OUTPUT("Area of a " + Base + " x " + Height + " triangle = " + getAreaOfTriangle(Base, Height));
+function main() {
+    var Base = INPUT("base");
+    var Height = INPUT("height");
+    OUTPUT("rectangle", getAreaOfRectangle(Base, Height));
+    OUTPUT("triangle", getAreaOfTriangle(Base, Height));
+}

@@ -15,3 +15,6 @@ function OUTPUT(Out, Val) {
 
 
 //CODE//
+
+$("#start").click(main);
+main();
