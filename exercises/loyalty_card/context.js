@@ -16,6 +16,9 @@ function OUTPUT(Out, Val) {
 
 //CODE//
 
-$("#start").click(function main() {
-    OUTPUT(calcDiscount(INPUT("spend"), INPUT("loyalty_card"))+"%");
-});
+
+function main() {
+    OUTPUT("discount", calcDiscount(INPUT("spend"), INPUT("loyalty_card"))+"%");
+}
+
+$("#start").click(main);
