@@ -1,12 +1,12 @@
 
+// Boo Hiss Globals.
 var iTestCount = 0;
 var iTestSuccesses = 0;
 var intervalID = 0;
 var currentExercise = 0;
 
-
+// assert for testing
 function assert( outcome, description ) {
-    
     iTestCount ++;
     var li = document.createElement('li');
     li.className = outcome ? 'pass' : 'fail';
@@ -19,9 +19,22 @@ function assert( outcome, description ) {
 } 
 
 $( document ).ready(function() {
-        
     
-   
+    
+    var aExercises = [
+        {
+            name:"Calculating Area",
+            folder:"area",
+            tags:[]
+        },
+        {
+            name:"Central Heating",
+            folder:"central_heating",
+            tags:[]
+        }
+    ];
+    
+    //findExercise by name    
     var findExercise = function(sExerciseHash) {
         var iExercise = aExercises.findIndex(function(element, index, array) {
             return sExerciseHash === element.folder;
@@ -33,22 +46,12 @@ $( document ).ready(function() {
         return iExercise;
     };
     
+    //Make it so every call gets fresh info from server
     $.ajaxSetup( {cache:false} );
     
-    $("#reset").click(function(){
-        var sExerciseHash = window.location.hash.replace("#","");
-        var iExercise = findExercise(sExerciseHash);
-        setExercise(iExercise, true);
-    });
-    
-    $("#reload").click(function(){
-        var sExerciseHash = window.location.hash.replace("#","");
-        var iExercise = findExercise(sExerciseHash);
-        setExercise(iExercise);
-    });
         
     var setExercise = function(iX, force) {
-        currExercise = aExercises[iX];
+        var currExercise = aExercises[iX];
         currentExercise = iX;
         if(typeof force === "undefined") {
             force = false;
@@ -115,10 +118,17 @@ $( document ).ready(function() {
                             }
                         };
                         
+                        if(!defaultStatement.actor.mbox.length) {
+                            var lastgasp = prompt("Your school email address", "");
+                            field.value = lastgasp;
+                            localStorage.setItem("tincan_mbox", lastgasp);
+                            defaultStatement.actor.mbox = lastgasp;
+                        }             
+                        
                         //console.log("endStatement =", endStatement);
                         if(defaultStatement.actor.mbox.length) {
                             tincan.sendStatement(endStatement);
-                        }             
+                        }        
                         
                         var sExtra = "";
                         var next = currentExercise + 1;
@@ -148,18 +158,18 @@ $( document ).ready(function() {
         });
     };
     
-    var aExercises = [
-        {
-            name:"Calculating Area",
-            folder:"area",
-            tags:[]
-        },
-        {
-            name:"Central Heating",
-            folder:"central_heating",
-            tags:[]
-        }
-    ];
+    $("#reset").click(function(){
+        var sExerciseHash = window.location.hash.replace("#","");
+        var iExercise = findExercise(sExerciseHash);
+        setExercise(iExercise, true);
+    });
+    
+    $("#reload").click(function(){
+        var sExerciseHash = window.location.hash.replace("#","");
+        var iExercise = findExercise(sExerciseHash);
+        setExercise(iExercise);
+    });
+    
     
     aExercises.forEach(function logArrayElements(element, index, array) {
         var li = document.createElement('li');
