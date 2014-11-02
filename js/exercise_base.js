@@ -56,7 +56,6 @@ $( document ).ready(function() {
     $.ajaxSetup( {cache:false} );
     
     var runCode = function(currExercise, bTest){
-        console.log("bTest =", bTest);
             $("#output").html("");
             $("#testoutput").html("");
             $("#result").html("");
@@ -114,7 +113,7 @@ $( document ).ready(function() {
                             
                             var sExtra = "";
                             var next = currentExercise + 1;
-                            console.log("next =", next);
+                            
                             if(next < aExercises.length) {
                                 //sExtra = "<a href='#"+aExercises[next].folder+"'>Next</a>";
                                 var newHash = "#"+aExercises[next].folder;
@@ -154,7 +153,7 @@ $( document ).ready(function() {
         $("#next").hide();
         
         var sStored = localStorage.getItem("code_"+currExercise.folder);
-        console.log("sStored =", sStored);
+        
         if(sStored && !force)
         {
              editor.setValue(sStored); // or session.setValue
