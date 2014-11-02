@@ -55,6 +55,87 @@ $( document ).ready(function() {
     //Make it so every call gets fresh info from server
     $.ajaxSetup( {cache:false} );
     
+    var runCode = function(currExercise, bTest){
+        console.log("bTest =", bTest);
+            $("#output").html("");
+            $("#testoutput").html("");
+            $("#result").html("");
+            
+            var sExerciseHash = window.location.hash.replace("#","");
+            var code = editor.getValue();
+            localStorage.setItem("code_"+sExerciseHash, code);
+    
+            $.get("exercises/"+currExercise.folder+"/tests.js", {}, function(testscript){
+                    
+                $.get("exercises/"+currExercise.folder+"/context.js", {}, function(contextscript){
+                    window.clearInterval(intervalID);
+                    var newcode = editor.getValue();
+                    var script = "";
+                    if(bTest) {
+                        script = "iTestSuccesses = 0;\niTestCount = 0;\n\n";
+                    }
+                    script +=  contextscript.replace("//CODE//", newcode);
+                    if(bTest) {
+                        script += "\n\n"+testscript+"\n\nreturn iTestSuccesses / iTestCount;";
+                    }
+                        
+                    var code = new Function(script);
+                    //console.log(script);
+                    
+                    var iScore = code();
+                    //console.log("iScore =", iScore);
+                    if(bTest) {
+                        if(iScore === 1) {
+                            var endStatement = defaultStatement;    
+                            endStatement.verb = {
+                                 "id": "http://adlnet.gov/expapi/verbs/completed",
+                                 "display": {"en-GB": "completed"}
+                            };
+                    
+                            endStatement.result = {
+                                "completion": true,
+                                "success": true,
+                                "score": {
+                                    "scaled": 1
+                                }
+                            };
+                            
+                            if(!defaultStatement.actor.mbox.length) {
+                                var lastgasp = prompt("Your school email address", "");
+                                field.value = lastgasp;
+                                localStorage.setItem("tincan_mbox", lastgasp);
+                                defaultStatement.actor.mbox = lastgasp;
+                            }             
+                            
+                            //console.log("endStatement =", endStatement);
+                            if(defaultStatement.actor.mbox.length) {
+                                tincan.sendStatement(endStatement);
+                            }        
+                            
+                            var sExtra = "";
+                            var next = currentExercise + 1;
+                            console.log("next =", next);
+                            if(next < aExercises.length) {
+                                //sExtra = "<a href='#"+aExercises[next].folder+"'>Next</a>";
+                                var newHash = "#"+aExercises[next].folder;
+                                $("#next").attr("href", newHash);
+                                
+                                $("#next").off("click").click(function(){
+                                     setExercise(next);
+                                }).show();
+                                
+                            } else if (next === aExercises.length) {
+                                sExtra = "<h2>You have finished</h2>"
+                            }
+                            
+                            $("#result").html("Well done. Your code passed all the tests.<br>"+sExtra);
+                        } else {
+                            $("#result").html("Please Try Again : Check the test results to work out what to do.");
+                        }
+                    }
+                }, "html");
+            }, "html");
+        };
         
     var setExercise = function(iX, force) {
         var currExercise = aExercises[iX];
@@ -85,83 +166,9 @@ $( document ).ready(function() {
                  editor.navigateFileStart();
             }, "html");
         }
-        $("#run").off("click").click(function(){
-            $("#output").html("");
-            $("#testoutput").html("");
-            $("#result").html("");
-            
-            var sExerciseHash = window.location.hash.replace("#","");
-            var code = editor.getValue();
-            localStorage.setItem("code_"+sExerciseHash, code);
-    
-            $.get("exercises/"+currExercise.folder+"/tests.js", {}, function(testscript){
-                    
-                $.get("exercises/"+currExercise.folder+"/context.js", {}, function(contextscript){
-                    window.clearInterval(intervalID);
-                    var newcode = editor.getValue();
-                    
-                    script = "iTestSuccesses = 0;\niTestCount = 0;\n\n";
-                    script +=  contextscript.replace("//CODE//", newcode);
-                    script += "\n\n"+testscript+"\n\nreturn iTestSuccesses / iTestCount;";
-                    
-                    var code = new Function(script);
-                    //console.log(script);
-                    
-                    var iScore = code();
-                    //console.log("iScore =", iScore);
-                    if(iScore === 1) {
-                        var endStatement = defaultStatement;    
-                        endStatement.verb = {
-                             "id": "http://adlnet.gov/expapi/verbs/completed",
-                             "display": {"en-GB": "completed"}
-                        };
-                
-                        endStatement.result = {
-                            "completion": true,
-                            "success": true,
-                            "score": {
-                                "scaled": 1
-                            }
-                        };
-                        
-                        if(!defaultStatement.actor.mbox.length) {
-                            var lastgasp = prompt("Your school email address", "");
-                            field.value = lastgasp;
-                            localStorage.setItem("tincan_mbox", lastgasp);
-                            defaultStatement.actor.mbox = lastgasp;
-                        }             
-                        
-                        //console.log("endStatement =", endStatement);
-                        if(defaultStatement.actor.mbox.length) {
-                            tincan.sendStatement(endStatement);
-                        }        
-                        
-                        var sExtra = "";
-                        var next = currentExercise + 1;
-                        console.log("next =", next);
-                        if(next < aExercises.length) {
-                            //sExtra = "<a href='#"+aExercises[next].folder+"'>Next</a>";
-                            var newHash = "#"+aExercises[next].folder;
-                            $("#next").attr("href", newHash);
-                            
-                            $("#next").off("click").click(function(){
-                                 setExercise(next);
-                            }).show();
-                            
-                        } else if (next === aExercises.length) {
-                            sExtra = "<h2>You have finished</h2>"
-                        }
-                        
-                        $("#result").html("Well done. Your code passed all the tests.<br>"+sExtra);
-                    } else {
-                        $("#result").html("Please Try Again : Check the test results to work out what to do.");
-                    
-                    }
-                    
-                }, "html");
-                
-            }, "html");
-        });
+        $("#run").off("click").click(function(){runCode(currExercise, false);});
+        $("#runtest").off("click").click(function(){runCode(currExercise, true);});
+        runCode(currExercise, false);
     };
     
     $("#reset").click(function(){
