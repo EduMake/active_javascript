@@ -31,7 +31,13 @@ $( document ).ready(function() {
             name:"Central Heating",
             folder:"central_heating",
             tags:[]
-        }
+        },
+        {
+            name:"Loyalty Card",
+            folder:"loyalty_card",
+            tags:[]
+        },
+        
     ];
     
     //findExercise by name    
