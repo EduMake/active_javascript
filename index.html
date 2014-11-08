@@ -24,8 +24,9 @@
         
         <div id="workspace">
             <pre id="editor"></pre>
-            <button id="run">Run Code</button>
-            <button id="runtest">Run Tests</button>
+            <!--<button id="run">Run Code</button>
+            <button id="runtest">Run Tests</button>-->
+            <button id="runtest">Test Code</button>
             <button id="reload">Reload Previous Progress</button>
             <button id="reset">Reset to Intial</button>
         </div>
@@ -33,9 +34,8 @@
             <h2>Task</h2>
             <ol id="task"></ol>
             <ul>
-                <li>Click "Run Code" each time you want to try your new code.</li>
-                <li>Click "Run Tests" each time you want to test your new code.</li>
-                <li>Your code needs to pass its test for you to complete this task.</li>
+                <li>Click "Test Code" when you think you might have finished (or you are stuck), to try your new code.</li>
+                <li>This will run it, so you can test it manually, and run automatic Unit Tests on it, to see if it is correct.</li>
             </ul>
             
         </div>
@@ -61,7 +61,9 @@
         <script src="external/jquery-1.11.0.min.js"></script>
         <script src="external/TinCanJS/build/tincan-min.js"></script>
         <script src="js/tincan_config.js"></script>
-        <script src="external/ace-builds/src-noconflict/ace.js" charset="utf-8"></script>
+        <!-- <script src="external/ace-builds/src-noconflict/ace.js" charset="utf-8"></script>-->
+        <script src="../ace/build/src/ace.js" charset="utf-8"></script>
+        <script src="external/jscs-browser.js"></script>
         <script src="js/exercise_base.js" charset="utf-8"></script>
 
         <script>

@@ -36,8 +36,7 @@ $( document ).ready(function() {
             name:"Loyalty Card",
             folder:"loyalty_card",
             tags:[]
-        },
-        
+        }
     ];
     
     //findExercise by name    
@@ -55,20 +54,116 @@ $( document ).ready(function() {
     //Make it so every call gets fresh info from server
     $.ajaxSetup( {cache:false} );
     
+    var executer = {
+        sCode:"",
+        sTestScript: "",
+        sContextScript: "",
+        bTest: true,
+        bRunnable:false,
+        aErrors:[],
+        aWarnings:[],
+        aAnnotations:[],
+        setAnnotations:function(aAnnotations) {
+            this.aAnnotations = aAnnotations;
+            
+            this.aErrors = this.aAnnotations.filter(function(err){
+                    return err.type === "error";
+            });
+            
+            this.aTests = this.aErrors.map(function(err){
+                    err.pass = false;
+            });
+            
+            this.aWarnings = this.aAnnotations.filter(function(err){
+                return err.type === "warning";
+            });
+            
+            if(this.aErrors.length)
+            {
+                this.bRunnable = false;
+            }
+            
+            return this.bRunnable;
+        },
+        getExecutionCode:function() {
+            var script = "";
+            
+            if(this.bTest) {
+                //script = "iTestSuccesses = 0;\niTestCount = 0;\n\n";
+                script = "var asset = this.assert;";
+            }
+            script +=  this.sContextScript.replace("//CODE//", this.sCode);
+            /*if(this.bTest) {
+                script += "\n\n"+this.sTestScript+"\n\nreturn iTestSuccesses / iTestCount;";
+            }*/
+            return script;
+                
+        },
+        execute:function(){
+            // TODO : this could be the execute context and the assert etc could live in here.....
+            if (!this.bRunnable) {
+                return false;
+            }
+            var script = this.getExecutionCode();
+            var funcCode = new Function(script);
+            funcCode.bind(this)();
+            
+        },
+        assert:function(outcome, description, type ) {
+            this.aTests.push({
+                text:description,
+                type:type,
+                pass:outcome,
+                row: false,
+                col: false
+            });
+            
+                
+        },
+        errorsToHTML:function(){
+            this.aAnnotations.forEach(oMess, iKey) {
+                var li = document.createElement('li');
+                li.className = oMess.pass ? 'pass' : 'fail';
+                if(outcome) {
+                    iTestSuccesses ++;
+                }
+                li.appendChild( document.createTextNode( oMess.text + " ( "+oMess.type+" )") ); 
+                if(oMess.row !== false) {
+                    li.click(editor.gotoLine(oMess.row));
+                }
+                var eOut = $("#testoutput");
+                eOut.append(li);
+            });
+            
+        },
+        errorsToTinCan:function() {
+            return this.aAnnotations;
+        }
+        
+    };
+    
     var runCode = function(currExercise, bTest){
+        //UI Setup 
         $("#output").html("");
         $("#testoutput").html("");
         $("#result").html("");
+        window.clearInterval(intervalID);
         
+        //Auto save
         var code = editor.getValue();
         localStorage.setItem("code_"+currExercise.folder, code);
         
         $.get("exercises/"+currExercise.folder+"/tests.js", {}, function(testscript){
-                
             $.get("exercises/"+currExercise.folder+"/context.js", {}, function(contextscript){
-                window.clearInterval(intervalID);
                 var newcode = editor.getValue();
                 var script = "";
+                
+                var annot = editor.getSession().getAnnotations();
+                // TODO : Split into UI and logical bits.
+                // TODO : add syntax / major errors
+                // TODO : add attempt counts
+                // TODO : send to tincan for every try
+                
                 if(bTest) {
                     script = "iTestSuccesses = 0;\niTestCount = 0;\n\n";
                 }
