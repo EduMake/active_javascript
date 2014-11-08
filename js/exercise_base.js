@@ -1,26 +1,8 @@
-
 // Boo Hiss Globals.
-var iTestCount = 0;
-var iTestSuccesses = 0;
 var intervalID = 0;
 var currentExercise = 0;
 
-// assert for testing
-function assert( outcome, description ) {
-    iTestCount ++;
-    var li = document.createElement('li');
-    li.className = outcome ? 'pass' : 'fail';
-    if(outcome) {
-        iTestSuccesses ++;
-    }
-    li.appendChild( document.createTextNode( description ) ); 
-    var eOut = $("#testoutput");
-    eOut.append(li);
-} 
-
 $( document ).ready(function() {
-    
-    
     var aExercises = [
         {
             name:"Calculating Area",
@@ -54,96 +36,109 @@ $( document ).ready(function() {
     //Make it so every call gets fresh info from server
     $.ajaxSetup( {cache:false} );
     
-    var executer = {
-        sCode:"",
-        sTestScript: "",
-        sContextScript: "",
-        bTest: true,
-        bRunnable:false,
-        aErrors:[],
-        aWarnings:[],
-        aAnnotations:[],
-        setAnnotations:function(aAnnotations) {
-            this.aAnnotations = aAnnotations;
+    var Executer = function (){
+        this.sCode = "";
+        this.sTestScript = "";
+        this.sContextScript = "";
+        this.bTest = true;
+        this.bRunnable = true;
+        this.aErrors = [];
+        this.aWarnings = [];
+        this.aAnnotations = [];
+        this.aTests = [];
+        
+        this.setAnnotations = function(aAnnotations) {
+            //console.log("aAnnotations =", aAnnotations);
             
-            this.aErrors = this.aAnnotations.filter(function(err){
-                    return err.type === "error";
+            var aRows = [];
+            this.aAnnotations = aAnnotations.map(function(oAnno){
+                //console.log("aRows =", aRows);
+                oAnno.pass = false;
+                oAnno.label = (oAnno.type === "error")?"Error":"Warning";
+                oAnno.keep = aRows.indexOf(oAnno.row) === -1;
+                aRows.push(oAnno.row);
+                return oAnno;
             });
             
-            this.aTests = this.aErrors.map(function(err){
-                    err.pass = false;
+            var iErrors = 0; 
+            this.aTests = this.aAnnotations.filter(function(err){
+                    //console.log("err =", err);
+                    if(err.type === "error") {
+                        iErrors ++;
+                    }
+                    return err.keep && (err.type === "error" || err.type === "warning");
             });
             
-            this.aWarnings = this.aAnnotations.filter(function(err){
-                return err.type === "warning";
-            });
-            
-            if(this.aErrors.length)
+            if(iErrors)
             {
                 this.bRunnable = false;
             }
             
             return this.bRunnable;
-        },
-        getExecutionCode:function() {
-            var script = "";
+        };
+        
+        this.getExecutionCode = function() {
+            var script = "var aTests = [];";
             
             if(this.bTest) {
-                //script = "iTestSuccesses = 0;\niTestCount = 0;\n\n";
-                script = "var asset = this.assert;";
+                script += "var assert = function(outcome, description, type ) {aTests.push({text:description,type:type,label:outcome?'Pass':'Fail',pass:outcome, row: false, col: false});};";
+                //script = "var assert = this.assert;//console.log(\"assert =\", assert);";
+                
             }
             script +=  this.sContextScript.replace("//CODE//", this.sCode);
-            /*if(this.bTest) {
-                script += "\n\n"+this.sTestScript+"\n\nreturn iTestSuccesses / iTestCount;";
-            }*/
+            if(this.bTest) {
+                //script += "\n\n"+this.sTestScript;//+"\n\nreturn iTestSuccesses / iTestCount;";
+                script += "\n\n"+this.sTestScript;
+            }
+            script += "\n\nreturn aTests;"
             return script;
                 
-        },
-        execute:function(){
+        };
+        
+        this.execute = function(){
+            //console.log("this.execute()");
             // TODO : this could be the execute context and the assert etc could live in here.....
             if (!this.bRunnable) {
                 return false;
             }
             var script = this.getExecutionCode();
+            //console.log("script =", script);
             var funcCode = new Function(script);
-            funcCode.bind(this)();
-            
-        },
-        assert:function(outcome, description, type ) {
-            this.aTests.push({
-                text:description,
-                type:type,
-                pass:outcome,
-                row: false,
-                col: false
-            });
-            
-                
-        },
-        errorsToHTML:function(){
-            this.aAnnotations.forEach(oMess, iKey) {
-                var li = document.createElement('li');
-                li.className = oMess.pass ? 'pass' : 'fail';
-                if(outcome) {
-                    iTestSuccesses ++;
-                }
-                li.appendChild( document.createTextNode( oMess.text + " ( "+oMess.type+" )") ); 
-                if(oMess.row !== false) {
-                    li.click(editor.gotoLine(oMess.row));
-                }
-                var eOut = $("#testoutput");
-                eOut.append(li);
-            });
-            
-        },
-        errorsToTinCan:function() {
-            return this.aAnnotations;
-        }
+            var aTests = funcCode();
+            //console.log("aTests =", aTests);
+            this.aTests = this.aTests.concat(aTests);
+            //console.log("this.aTests =", this.aTests);
+        };
+        
+        this.resultsToHTML = function(){
+            //console.log("this.resultsToHTML this.aTests =", this.aTests);
+            if(this.aTests.length) {
+                this.aTests.forEach(function(oMess, iKey) {
+                    //console.log("oMess =", oMess);
+                    var li = document.createElement('li');
+                    li.className = oMess.label.toLowerCase();
+                    
+                    var sText = oMess.text;
+                    
+                    if(oMess.row !== false) {
+                        $(li).click(function(){editor.gotoLine(oMess.row + 1);});
+                        sText = "Line "+(oMess.row+1)+" : "+sText;
+                    }
+                    
+                    li.appendChild( document.createTextNode( sText  ) ); 
+                    var eOut = $("#testoutput");
+                    eOut.append(li);
+                });
+            }
+        };
+        
+        this.resultsToTinCan = function() {
+            return this.aTests;
+        };
         
     };
     
     var runCode = function(currExercise, bTest){
-        //UI Setup 
         $("#output").html("");
         $("#testoutput").html("");
         $("#result").html("");
@@ -155,27 +150,29 @@ $( document ).ready(function() {
         
         $.get("exercises/"+currExercise.folder+"/tests.js", {}, function(testscript){
             $.get("exercises/"+currExercise.folder+"/context.js", {}, function(contextscript){
-                var newcode = editor.getValue();
-                var script = "";
                 
                 var annot = editor.getSession().getAnnotations();
-                // TODO : Split into UI and logical bits.
-                // TODO : add syntax / major errors
-                // TODO : add attempt counts
-                // TODO : send to tincan for every try
+                //console.log("annot =", annot);
+                var oExecuter = new Executer();
+                //console.log("oExecuter =", oExecuter);
+                oExecuter.setAnnotations(annot);
+                oExecuter.sCode = editor.getValue();
+                oExecuter.sTestScript = testscript;
+                oExecuter.sContextScript = contextscript;
+                oExecuter.bTest = bTest;
                 
-                if(bTest) {
-                    script = "iTestSuccesses = 0;\niTestCount = 0;\n\n";
-                }
-                script +=  contextscript.replace("//CODE//", newcode);
-                if(bTest) {
-                    script += "\n\n"+testscript+"\n\nreturn iTestSuccesses / iTestCount;";
-                }
-                    
-                var code = new Function(script);
-                var iScore = code();
                 
+                oExecuter.execute();
+                oExecuter.resultsToHTML();
+                var aTinOut = oExecuter.resultsToTinCan();
+                console.log("aTinOut =", aTinOut);
+                
+                
+                /*
                 if(bTest) {
+                    // TODO : add attempt counts
+                    // TODO : send to tincan for every try
+                
                     if(iScore === 1) {
                         var endStatement = defaultStatement;    
                         endStatement.verb = {
@@ -224,7 +221,7 @@ $( document ).ready(function() {
                     } else {
                         $("#result").html("Please Try Again : Check the test results to work out what to do.");
                     }
-                }
+                }*/
             }, "html");
         }, "html");
     };
@@ -247,7 +244,7 @@ $( document ).ready(function() {
         $("#start").off("click");
         
         var sStored = localStorage.getItem("code_"+currExercise.folder);
-        console.log("currExercise.folder =", currExercise.folder);
+        //console.log("currExercise.folder =", currExercise.folder);
         
         if(sStored && fromstorage)
         {
