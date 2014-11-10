@@ -78,7 +78,7 @@ h1 {
 
 .error:before {
     color: red;
-    content: "ERROR: ";
+    content: "ERROR: CODE NOT RUN: ";
     font-weight: bold;
 }
 .warning:before {
