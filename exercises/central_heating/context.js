@@ -20,7 +20,8 @@ function GET(ControlName) {
     return $("#" + ControlName).val();
 }
 
-
+$("#airtemp").val(26);
+$("#boiler").val("OFF");
 var MinTemp = INPUT("mintemp");
 var MaxTemp = INPUT("maxtemp");
 var AirTemp = GET("airtemp");
@@ -28,6 +29,15 @@ var Boiler = GET("boiler");
 
 
 //CODE//
+
+function loop() {
+    MinTemp = INPUT("mintemp");
+    MaxTemp = INPUT("maxtemp");
+    AirTemp = GET("airtemp");
+    OldStatus = GET("boiler");
+    Boiler = calcBoilerStatus(MinTemp, MaxTemp, AirTemp, OldStatus);
+    OUTPUT("boiler", Boiler);
+}
 
 
 

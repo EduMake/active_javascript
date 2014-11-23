@@ -37,7 +37,7 @@ var Executer = function (){
         var aRows = [];
         this.aAnnotations = aAnnotations.map(function(oAnno){
             //console.log("aRows =", aRows);
-            oAnno.pass = false;
+            oAnno.pass = (oAnno.type === "error")?false:true;
             oAnno.label = (oAnno.type === "error")?"Error":"Warning";
             oAnno.keep = aRows.indexOf(oAnno.row) === -1;
             aRows.push(oAnno.row);
@@ -70,25 +70,23 @@ var Executer = function (){
     };
     
     this.execute = function(){
-        //console.log("this.execute()");
-        // TODO : this could be the execute context and the assert etc could live in here.....
+        console.log("this.execute");
         this.calcAnnoErrors();
         if (!this.bRunnable) {
+            console.log("Not bRunnable");
+            console.log("this =", this);
             return false;
         }
         var script = this.getExecutionCode();
-        //console.log("script =", script);
         var funcCode = new Function(script);
         var aTests = funcCode();
-        //console.log("aTests =", aTests);
+        console.log("aTests =", aTests);
         this.aTests = this.aTests.concat(aTests);
-        //console.log("this.aTests =", this.aTests);
-        //this.bRunnable = false;
-        //this.sCode = "";
+        console.log("this.aTests =", this.aTests);
     };
     
     this.resultsToHTML = function(){
-        //console.log("this.resultsToHTML this.aTests =", this.aTests);
+        console.log("this.resultsToHTML this.aTests =", this.aTests);
         if(this.aTests.length) {
             this.aTests.forEach(function(oMess, iKey) {
                 //console.log("oMess =", oMess);
@@ -113,11 +111,11 @@ var Executer = function (){
         return this.aTests;
     };
     
-    this.calcScore = function() {
-        var aScores = this.aTests.map(function(){
-            return ;
+    this.getSuccess = function() {
+        var aFails = this.aTests.filter(function(oTest){
+            return oTest.pass === false;
         });            
-        console.log("aScores =", aScores);
+        return aFails.length  === 0; 
     };
     
     this.checkReady = function() {

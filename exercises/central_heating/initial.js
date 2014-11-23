@@ -7,12 +7,4 @@ function calcBoilerStatus(MinTemp, MaxTemp, AirTemp, Status) {
     return Status;
 }
 
-function loop() {
-    MinTemp = INPUT("mintemp");
-    MaxTemp = INPUT("maxtemp");
-    AirTemp = GET("airtemp");
-    OldStatus = GET("boiler");
-    Boiler = calcBoilerStatus(MinTemp, MaxTemp, AirTemp, OldStatus);
-    OUTPUT("boiler", Boiler);
-}
 
