@@ -75,8 +75,25 @@ h1 {
     content: "FAIL: ";
     font-weight: bold;
 }
+
+.error:before {
+    color: red;
+    content: "ERROR: CODE NOT RUN: ";
+    font-weight: bold;
+}
+.warning:before {
+    color: orange;
+    content: "WARNING: ";
+    font-weight: bold;
+}
+
 #next{
     font-weight: bold;
     font-size: 1.8em;
 
+}
+
+
+.no-close .ui-dialog-titlebar-close {
+display: none;
 }

@@ -1,0 +1,8 @@
+{
+  "name": "active_javascript",
+  "version": "0.1.0",
+  "devDependencies": {
+    "grunt": "~0.4.5",
+    "grunt-dir2json": "~0.1.6"
+  }
+}
