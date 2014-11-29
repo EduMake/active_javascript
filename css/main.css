@@ -92,3 +92,8 @@ h1 {
     font-size: 1.8em;
 
 }
+
+
+.no-close .ui-dialog-titlebar-close {
+display: none;
+}

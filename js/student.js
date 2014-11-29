@@ -1,12 +1,110 @@
-var Student = function (){
+var Student = function (sFormSelector){
+    this.sLocalStorageName = "student_details_test1";
     this.sEmail = "";
+    this.sFormSelector = false;
+    this.loader = jQuery.Deferred();
     this.aProgressOnCourse = [];
-    this.sTargetLevel = false;
+    this.sWorkingGrade = false;
+    this.oGrades = {
+                51: "Techincals Distinction *",
+                50: "GCSE A*", //We will put the others in although their is no presumption of relative worth just a logical order
+                45: "GCSE A",
+                40: "GCSE B",
+                35: "GCSE C",
+                31: "Working towards GCSE C",
+                30: "GCSE D",
+                25: "GCSE E",
+                20: "GCSE F",
+                0: "Fail"
+            };
+            
+    this.getNameForGrade = function(iLevel) {
+        var iWorkingGrade = parseInt(this.sWorkingGrade, 10);
+        // IF our working grade is a non standard (x5) grade show the working grade name 
+        if(iWorkingGrade % 5 > 0  && (iLevel ===  Math.floor(iWorkingGrade / 5) *5)) {
+            return this.oGrades[this.sWorkingGrade];
+        }
+        return this.oGrades[iLevel];
+    };
+            
+    this.save = function(oStudentData){
+        if(typeof oStudentData === "undefined") {
+            oStudentData = {};
+            oStudentData.sEmail       = this.sEmail;
+            oStudentData.sWorkingGrade = this.sWorkingGrade;
+        }
+        localStorage.setItem(this.sLocalStorageName, JSON.stringify(oStudentData));
+        return this.load();
+    };
+    
+    this.displayStudent = function() {
+        $("#studentdetails").html(this.sEmail+" "+this.oGrades[this.sWorkingGrade]);
+    };
+    
+    this.load = function() {
+        if (localStorage.getItem(this.sLocalStorageName)) {
+            var oStudentData   = JSON.parse(localStorage.getItem(this.sLocalStorageName));
+            this.sEmail        = oStudentData.sEmail;
+            this.sWorkingGrade = oStudentData.sWorkingGrade;
+            this.displayStudent();
+            this.loader.resolve();
+            return true;
+        }
+        return false;
+    };
+    
+    this.getCurrentStudent = function() {
+        this.loader.then(this.displayStudent.bind(this), this.getCurrentStudent.bind(this));
+        if(!this.load()) {
+            if(this.sFormSelector) {
+                this.studentInfoDialog();
+            }
+        }
+    };
+    
+    this.isValidEmail = function(x) {
+        var atpos = x.indexOf("@");
+        var dotpos = x.lastIndexOf(".");
+        if (atpos< 1 || dotpos<atpos+2 || dotpos+2>=x.length) {
+            //alert("Not a valid e-mail address");
+            return false;
+        }
+        return true;
+    };
+    
+    this.studentInfoDialog = function(){
+        $(this.sFormSelector).modal({
+            escapeClose: false,
+            clickClose: false,
+            showClose: false
+        });
+        
+    };
+    
+    $("#student_save").click(function(){
+        var oStudent = {};
+        oStudent.sWorkingGrade = $("#student_workinggrade").val();
+        oStudent.sEmail        = $("#student_email").val();
+        console.log("oStudent =", oStudent);
+        if(this.isValidEmail(oStudent.sEmail) === false) {
+            console.log("not valid email");
+            return false;
+        }
+        this.save(oStudent);
+        $.modal.close();   
+    }.bind(this));
+    
+    if(typeof sFormSelector !== "undefined") {
+        this.sFormSelector = sFormSelector;
+        this.getCurrentStudent();
+    }
+        
     
     this.getTargetLevel = function () {
-        if( this.sTargetLevel !== false) {
-            return this.sTargetLevel;
+        if( this.sWorkingGrade !== false) {
+            return this.sWorkingGrade;
         }
+        /* TODO : get working rade from LRS assesments
         tincan.getStatements(
             {
                 
@@ -30,15 +128,12 @@ var Student = function (){
                     // if not start course progrress request
                     // handle success, 'result' is a TinCan.StatementsResult object
                     //            
-                    this.sTargetLevel = "TODO";
-                    return this.sTargetLevel;
-                    
-                    console.log(result);
+                    this.sWorkingGrade = "TODO";
+                    return this.sWorkingGrade;
                 }
             }
         );
-
-    
+        */
         /*
             activity
             http://adlnet.gov/expapi/activities/course
@@ -49,27 +144,11 @@ var Student = function (){
             assessed URI: http://edumake.org/verb/assessed
         
             {"name":{"en-US":"assessed"},"description":{"en-US":"Indicates the user had their work assessed by a human. And a mark was given (details mapping score to grade in context)."}}
-        */  
-    
-    
+        */      
     };
-    
-    var oGrades = {
-                51: "Techincals Distinction *"
-                50: "GCSE A*", //We will put the others in although their is no presumption of relative worth just a logical order
-                45: "GCSE A",
-                40: "GCSE B",
-                35: "GCSE C",
-                31: "Working towards GCSE C",
-                30: "GCSE D",
-                25: "GCSE E",
-                20: "GCSE F",
-                0: "Fail"
-            };
-            
-    
-  
-  
-  
-    
 };
+/* EXAMPLE : set up student object attached to form and change link
+$( document ).ready(function() {
+    var oStudent = new Student("#student-details-form");
+});
+*/

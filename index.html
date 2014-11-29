@@ -5,11 +5,6 @@
         <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
         <title>Javascript : Area Calc Simulation</title>
         <link href="css/main.css" rel="stylesheet" type="text/css" media="all">
-        <style>
-            #feditor {
-                height: 20em;
-            }
-        </style>        
     </head>
     <body>
         <header>
@@ -17,21 +12,19 @@
         <h1>Active Javascript</h1>
     
         <div id="tincanid">
-            <label for="tincanemail">School Email Address</label> <input type="email" id="tincanemail" />
-            <button id="save">Save</button>
+            <span id="studentdetails"></span>  <a href="#student-details-form" rel="modal:open">Change</a>
         </div>
         </header>
         
         <div id="workspace">
             <pre id="editor"></pre>
-            <!--<button id="run">Run Code</button>
-            <button id="runtest">Run Tests</button>-->
             <button id="runtest">Test Code</button>
-            <button id="reload">Reload Previous Progress</button>
+            <button id="reload">Reload Last Tested Code</button>
             <button id="reset">Reset to Intial</button>
+            <button id="easier">Make Easier</button>
         </div>
         <div id="taskbox">
-            <h2>Task</h2>
+            <h2>Task - <span id="taskname"></span> - <span id="taskleveltext"></span></h2>
             <ol id="task"></ol>
             <ul>
                 <li>Click "Test Code" when you think you might have finished (or you are stuck), to try your new code.</li>
@@ -56,16 +49,42 @@
             <h3 id="result"></h3>
             <a href="" id="next">Next Exercise</a>
         </div>
+        </body>
         
+        <div id="student-details-form"  style="display:none;" title="Please Sign In">
+            <p >Please use your school email address, and your current working grade from your book.</p>
+            <label for="email">Email</label>
+            <input type="text" name="email" id="student_email" value="" class=""/>
+            <br />
+            <label for="student_workinggrade">Working Grade</label>
+            <select id="student_workinggrade" class="">
+                <option value="50">GCSE A*</option>
+                <option value="45">GCSE A</option>
+                <option value="40">GCSE B</option>
+                <option value="35">GCSE C</option>
+                <option value="31">Working towards GCSE C</option>
+            </select>
+            <button id="student_save">Save</button>
+    
+            <a href="#" rel="modal:close">
+        </div>
         
+   
+  
         <script src="external/jquery-1.11.0.min.js"></script>
+        <link rel="stylesheet" href="external/jquery-modal/jquery.modal.css" type="text/css" media="screen" />
+
+        <script src="external/jquery-modal/jquery.modal.js" type="text/javascript" charset="utf-8"></script>
         <script src="external/TinCanJS/build/tincan-min.js"></script>
-        <script src="js/tincan_config.js"></script>
-        <script src="external/ace-builds/src-noconflict/ace.js" charset="utf-8"></script>
-        <!--<script src="../ace/build/src/ace.js" charset="utf-8"></script>-->
+        
+        <script src="external/ace/ace.js" charset="utf-8"></script>
+        
         <script src="external/jscs-browser.js"></script>
+        
+        <script src="js/student.js" charset="utf-8"></script>
+        <script src="js/exercise.js" charset="utf-8"></script>
         <script src="js/executer.js" charset="utf-8"></script>
-        <script src="js/exercise_base.js" charset="utf-8"></script>
+        <script src="js/active_javascript.js" charset="utf-8"></script>
 
     </body>
 </html>

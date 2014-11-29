@@ -4,3 +4,6 @@
 [submodule "external/ace-builds"]
 	path = external/ace-builds
 	url = https://github.com/ajaxorg/ace-builds.git
+[submodule "external/jquery-modal"]
+	path = external/jquery-modal
+	url = https://github.com/kylefox/jquery-modal.git

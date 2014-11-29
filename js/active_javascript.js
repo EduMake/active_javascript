@@ -11,22 +11,112 @@ var currentExercise = 0;
 
 
 var ActiveJavascript = function (){
+    this.sDefaultExercise = "central_heating";
+    this.sExercise = false;
     this.aExercises = false;
-    this.oStudent = false;
+    this.dExerciseLoader = $.getJSON("dist/exercises.json", {}, function(data){
+        this.aExercises = data;    
+        //console.log("this.aExercises =", this.aExercises);
+    }.bind(this));
+    
+    this.aLRSConf = false;
+    this.dLRSLoader = $.getJSON("lrs_config.json", {}, function(data){
+        this.aLRSConf = data;    
+    }.bind(this));
+    
+    
+    this.oStudent = new Student("#student-details-form");
+    
+    
+    this.parseURL = function() {
+         this.sPageHash = window.location.hash.replace("#","");
+         this.sSite = window.location.href.replace(window.location.search, "").replace(window.location.hash, "");
+         //console.log("this.sSite =", this.sSite);
+    };
+    
+    
+    this.whenLoaded = function() {
+        this.parseURL();
+        if(this.aExercises.hasOwnProperty(this.sPageHash)) {
+            this.sExercise = this.sPageHash;
+        } else {
+            this.sExercise = this.sDefaultExercise;
+        }
+        
+        var thisEx = this.aExercises[this.sExercise];
+        
+        this.oExercise = new Exercise(thisEx, this.sExercise);
+        
+        this.oExercise.setLevel(this.oStudent.sWorkingGrade);
+        $("#taskleveltext").html(this.oStudent.getNameForGrade(this.oExercise.iLevel));
+
+        
+        
+        editor.getSession().on("changeAnnotation", function(){
+            var annot = editor.getSession().getAnnotations();
+            //console.log("annot =", annot);
+            this.oExercise.oExecuter.setAnnotations(annot);
+        }.bind(this));
+        
+        //$("#run").off("click").click(function(){this.oExercise.runCode(false);}.bind(this));
+        $("#runtest").off("click").click(function(){this.oExercise.runCode(true);}.bind(this));
+        $("#reload").off("click").click(function(){this.oExercise.reloadEditorContent();}.bind(this));
+        $("#reset").off("click").click(function(){this.oExercise.loadEditorContent();}.bind(this));
+        $("#easier").off("click").click(function(){
+            this.oExercise.makeEasier(); 
+            $("#taskleveltext").html(this.oStudent.getNameForGrade(this.oExercise.iLevel));
+        }.bind(this));
+        
+        this.oExercise.runCode(false);
+    };
+
+    $.when( this.dExerciseLoader, this.dLRSLoader, this.oStudent.loader )
+        .then( this.whenLoaded.bind(this), function(){console.log("Fail");} );
+    
+    
     this.oExercise = false;
     this.oDefaultStatement = false;
-    this.sCourse = ;
-    this.sExercise;
-    this.iLevel;
+    this.sCourse = "";
+    this.sExercise = "";
+    
+    this.getExerciseGrade = function(iGrade) {
+        return Math.floor(iGrade / 5) *5;    
+    };
+    
+    this.loadTinCanConfig = function() {
+        // TODO : does our exerecise add an LRS ?
+        this.defaultStatement = {
+            actor: {
+                mbox: ""
+            },
+            verb: {
+                id: "http://adlnet.gov/expapi/verbs/initialized",
+                "display": {"en-GB": "initialised"}
+            },
+            target: { //Object ???
+                id: window.location.href,
+                type: "http://adlnet.gov/expapi/activities/simulation",
+                definition: {
+                    name: { "en-GB": $("title").text() }
+                }
+            }
+        };
+        
+    };
     this.loadTinCanConfig();
     
-    this.loadStudent();
-    this.parseURL();
-    this.loadExercise(); //include asking for extra tinCan config
+    
+    /*this.loadExercise(); //include asking for extra tinCan config
     this.setGrade();
     this.testButton();
     this.nextExercise();
-}
+    */
+    
+    
+    
+};
+
+
 
 
 /*
@@ -39,31 +129,15 @@ var ActiveJavascript = function (){
  
     
     
-    var defaultStatement = {
-        actor: {
-            mbox: ""
-        },
-        verb: {
-            id: "http://adlnet.gov/expapi/verbs/initialized",
-            "display": {"en-GB": "initialised"}
-        },
-        target: { //Object ???
-            id: window.location.href,
-            type: "http://adlnet.gov/expapi/activities/simulation",
-            definition: {
-                name: { "en-GB": $("title").text() }
-            }
-        }
-    };
     
     if(localStorage.getItem("tincan_mbox")){
         defaultStatement.actor.mbox = localStorage.getItem("tincan_mbox");
     }    
     
     //findExercise by name    
-    var findExercise = function(sExerciseHash) {
+    var findExercise = function(sPageHash) {
         var iExercise = aExercises.findIndex(function(element, index, array) {
-            return sExerciseHash === element.folder;
+            return sPageHash === element.folder;
         });
         
         if(iExercise === -1) {
@@ -73,7 +147,6 @@ var ActiveJavascript = function (){
     };
     
     //Make it so every call gets fresh info from server
-    $.ajaxSetup( {cache:false} );
     var isValidEmail = function(x) {
         var atpos = x.indexOf("@");
         var dotpos = x.lastIndexOf(".");
@@ -241,14 +314,14 @@ var ActiveJavascript = function (){
     };
     
     $("#reset").click(function(){
-        var sExerciseHash = window.location.hash.replace("#","");
-        var iExercise = findExercise(sExerciseHash);
+        var sPageHash = window.location.hash.replace("#","");
+        var iExercise = findExercise(sPageHash);
         setExercise(iExercise, false);
     });
     
     $("#reload").click(function(){
-        var sExerciseHash = window.location.hash.replace("#","");
-        var iExercise = findExercise(sExerciseHash);
+        var sPageHash = window.location.hash.replace("#","");
+        var iExercise = findExercise(sPageHash);
         setExercise(iExercise, true);
     });
     
@@ -271,9 +344,9 @@ var ActiveJavascript = function (){
         setExercise(iNew);
     });
     
-    var sExerciseHash = window.location.hash.replace("#","");
+    var sPageHash = window.location.hash.replace("#","");
     
-    var iExercise = findExercise(sExerciseHash);
+    var iExercise = findExercise(sPageHash);
     setExercise(iExercise);
     
     var field = document.getElementById("tincanemail");
@@ -298,5 +371,7 @@ var ActiveJavascript = function (){
 
 
 $( document ).ready(function() {
+    $.ajaxSetup( {cache:false} );
     var ActiveJS = new ActiveJavascript();
+    
 });

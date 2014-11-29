@@ -1,7 +1,7 @@
-var Executer = function (){
+var Executer = function (sTestScript, sContextScript){
     this.sCode = "";
-    this.sTestScript = "";
-    this.sContextScript = "";
+    this.sTestScript = sTestScript;
+    this.sContextScript = sContextScript;
     this.bFirstRun = false;
     
     this.bTest = true;
@@ -70,11 +70,13 @@ var Executer = function (){
     };
     
     this.execute = function(){
+        window.clearInterval(intervalID);
+        console.log("intervalID =", intervalID);
         console.log("this.execute");
         this.calcAnnoErrors();
         if (!this.bRunnable) {
-            console.log("Not bRunnable");
-            console.log("this =", this);
+            console.log("Not bRunnable this.bRunnable =", this.bRunnable, "this.bAnnotations =", this.bAnnotations, "this.sCode.length =", this.sCode.length,            "this.sTestScript.length =", this.sTestScript.length,"this.sContextScript.length =", "this.bFirstRun =", this.bFirstRun, this.sContextScript.length,"this.bReady =", this.bReady,"this.bRunnable =", this.bRunnable);
+        
             return false;
         }
         var script = this.getExecutionCode();
@@ -84,6 +86,8 @@ var Executer = function (){
         this.aTests = this.aTests.concat(aTests);
         console.log("this.aTests =", this.aTests);
     };
+    
+    
     
     this.resultsToHTML = function(){
         console.log("this.resultsToHTML this.aTests =", this.aTests);
@@ -119,16 +123,10 @@ var Executer = function (){
     };
     
     this.checkReady = function() {
+        window.clearInterval(intervalID);
         this.bReady = this.bAnnotations && this.sCode.length > 0 && this.sTestScript.length > 0 && this.sContextScript.length > 0;
         this.bRunnable = this.bReady && !this.bSyntaxErrors;
-        console.log("this.bAnnotations =", this.bAnnotations);
-        console.log("this.sCode.length =", this.sCode.length);
-        console.log("this.sTestScript.length =", this.sTestScript.length);
-        console.log("this.sContextScript.length =", this.sContextScript.length);
-        console.log("this.bReady =", this.bReady);
-        console.log("this.bRunnable =", this.bRunnable);
-        
-            console.log("this.bFirstRun =", this.bFirstRun);
+        console.log("this.bAnnotations =", this.bAnnotations, "this.sCode.length =", this.sCode.length,            "this.sTestScript.length =", this.sTestScript.length,"this.sContextScript.length =", "this.bFirstRun =", this.bFirstRun, this.sContextScript.length,"this.bReady =", this.bReady,"this.bRunnable =", this.bRunnable);
         
         if(this.bReady && !this.bFirstRun) {
             this.bFirstRun = true;
@@ -139,6 +137,7 @@ var Executer = function (){
     };
     
     this.setCode = function(code) {
+        
         this.sCode = code;
         this.checkReady();
     };

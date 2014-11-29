@@ -1,117 +1,107 @@
-var Exercise = function (){
-    this.oExecuter = "";
+var Exercise = function (aData, sExercise){
+    this.oExecuter = false;
     this.iLevel = 0;
-    this.sTestScript = "";
-    this.sContextScript = "";
-};    
-        
-        var editor = ace.edit("editor");
-editor.setTheme("ace/theme/dawn");
-editor.getSession().setMode("ace/mode/javascript");
-editor.setWrapBehavioursEnabled(true);
-editor.setFontSize(16);
-editor.setShowPrintMargin(false);
-
-// Boo Hiss Globals.
-var intervalID = 0;
-var currentExercise = 0;
-
-
-
-$( document ).ready(function() {
-    var oExecuter;
-    var aExercises = [
-        {
-            name:"Calculating Area",
-            folder:"area",
-            tags:[]
-        },
-        {
-            name:"Central Heating",
-            folder:"central_heating",
-            tags:[]
-        },
-        {
-            name:"Loyalty Card",
-            folder:"loyalty_card",
-            tags:[]
-        }
-    ];
+    this.aData = aData;
+    this.oLevel = {};
+    this.sExercise = sExercise;
     
-    
-    tincan = new TinCan (
-        {
-            recordStores: TinCanRecordStores
-        }
-    );
- 
-    
-    
-    var defaultStatement = {
-        actor: {
-            mbox: ""
-        },
-        verb: {
-            id: "http://adlnet.gov/expapi/verbs/initialized",
-            "display": {"en-GB": "initialised"}
-        },
-        target: { //Object ???
-            id: window.location.href,
-            type: "http://adlnet.gov/expapi/activities/simulation",
-            definition: {
-                name: { "en-GB": $("title").text() }
-            }
-        }
-    };
-    
-    if(localStorage.getItem("tincan_mbox")){
-        defaultStatement.actor.mbox = localStorage.getItem("tincan_mbox");
-    }    
-    
-    //findExercise by name    
-    var findExercise = function(sExerciseHash) {
-        var iExercise = aExercises.findIndex(function(element, index, array) {
-            return sExerciseHash === element.folder;
-        });
-        
-        if(iExercise === -1) {
-            iExercise = 0;
-        }
-        return iExercise;
-    };
-    
-    //Make it so every call gets fresh info from server
-    $.ajaxSetup( {cache:false} );
-    var isValidEmail = function(x) {
-        var atpos = x.indexOf("@");
-        var dotpos = x.lastIndexOf(".");
-        if (atpos< 1 || dotpos<atpos+2 || dotpos+2>=x.length) {
-            //alert("Not a valid e-mail address");
+    this.loadLevel = function() {
+        if(!this.aData.hasOwnProperty(this.iLevel)) {
+            console.log("no level "+this.iLevel)
             return false;
         }
-        return true;
+        this.oLevel = this.aData[this.iLevel];
+        this.resetGUI();
+        //$("#start").off("click");
+        this.oExecuter = new Executer(this.aData.tests, this.aData.context);
+        
+        this.loadEditorContent();
+        $("#taskname").html(this.aData.info.name);
     };
     
-    var runCode = function(currExercise, bTest){
-        //Exercise.resetUI();
+    this.resetGUI =function () {
         $("#output").html("");
         $("#testoutput").html("");
         $("#result").html("");
-        $("#simulation").html(currExercise.hSimulation); 
+        $("#simulation").html(this.aData.simulation); 
+        $("title").text("Active Javascript : " + this.aData.info.name);
+        $("h1").text("Active Javascript : " + this.aData.info.name);
+        $("#task").html(this.oLevel.task);    
+        
+        $("#next").hide();
+        
+    };
+    
+    this.loadEditorContent = function () {
+        editor.setValue(this.oLevel.initial); // or session.setValue
+        editor.navigateFileStart();
+    };
+    
+    this.getCodeLocalStoreageKey = function() {
+        return "active-" + this.sExercise + "-" + this.iLevel;
+    };
+    
+    this.reloadEditorContent = function () {
+        console.log("this.reloadEditorContent =", this.reloadEditorContent);
+        // TODO : add student to the key?
+        var sKey = this.getCodeLocalStoreageKey();
+        var sLocalCode = localStorage.getItem(sKey);
+        if(sLocalCode) {
+            editor.setValue(sLocalCode); // or session.setValue
+            editor.navigateFileStart();
+        } else {
+            this.loadEditorContent();
+        }
+    };
+    
+    this.setLevel = function(iLevel) {
+        this.iLevel = Math.floor(iLevel / 5) *5;
+        this.loadLevel();    
+    };
+    
+    this.makeEasier = function () {
+        var iEasierLevel = this.iLevel - 5;
+        if(!this.aData.hasOwnProperty(iEasierLevel)) {
+            console.log("no easier level "+this.iLevel);
+            return false;
+        }
+        
+        var sOldCode = editor.getValue();
+        this.setLevel(iEasierLevel);
+        var sOldCodeStart = "\n/* NOTE : Your previous code is here, in case it is of use.\n";
+        
+        var sEasierCode = (this.oLevel.initial + sOldCodeStart+sOldCode+"*/").replace("*/*/","*/");
+        editor.setValue(sEasierCode); // or session.setValue
+        editor.navigateFileStart();
+        
+    };
+    
+    
+    this.runCode = function(bTest){
+        this.resetGUI();
         window.clearInterval(intervalID);
         
         //Auto save
         var code = editor.getValue();
-        localStorage.setItem("code_"+currExercise.folder, code);
+        console.log("code =", code);
+        if(bTest) {
+            var sKey = this.getCodeLocalStoreageKey();
+            console.log("sKey =", sKey);
+            localStorage.setItem(sKey, code);
+        }
         
-        oExecuter.setTest(bTest);
+        this.oExecuter.setCode(code);
+        this.oExecuter.setTest(bTest);
                 
-        oExecuter.execute();
-        oExecuter.resultsToHTML();
-        var aTinOut = oExecuter.resultsToTinCan();
-        var bSuccess = oExecuter.getSuccess();
-        console.log("bSuccess =", bSuccess);
+        this.oExecuter.execute();
+        console.log("this.oExecuter =", this.oExecuter);
+        // TODO : move resultsToHTML to exercise
+        this.oExecuter.resultsToHTML();
         
+        //var aTinOut = oExecuter.resultsToTinCan();
+        var bSuccess = this.oExecuter.getSuccess();
+        console.log("bSuccess =", bSuccess);
+        /*
         if(bTest) {
             var sEmail = defaultStatement.actor.mbox;
             while(!isValidEmail(sEmail)) {
@@ -186,48 +176,12 @@ $( document ).ready(function() {
         
             // TODO : add attempt counts
             // TODO : send to tincan for every try
-        }  
+        } 
+        */
     };
-        
-    var setExercise = function(iX, fromstorage) {
-        var currExercise = aExercises[iX];
-        currentExercise = iX;
-        if(typeof fromstorage === "undefined") {
-            fromstorage = true;
-        }
-        
-        $("title").text("Active Javascript : " + currExercise.name);
-        $("h1").text("Active Javascript : " + currExercise.name);
-        $("#task").load("exercises/"+currExercise.folder+"/task.html");    
-        $("#simulation").load("exercises/"+currExercise.folder+"/simulation.html");
-        
-        currExercise.hSimulation = $("#simulation").html();
-        
-        $("#output").html("");
-        $("#testoutput").html("");
-        $("#result").html("");
-        $("#next").hide();
-        $("#start").off("click");
-        
-        var sStored = localStorage.getItem("code_"+currExercise.folder);
-        //console.log("currExercise.folder =", currExercise.folder);
-        
-        
-        $.get("exercises/"+currExercise.folder+"/tests.js", {}, function(testscript){
-                oExecuter.setTestScript(testscript);
-                
-        }, "html");
-                
-        $.get("exercises/"+currExercise.folder+"/context.js", {}, function(contextscript){
-                oExecuter.setContextScript(contextscript);
-                
-        }, "html");     
-                    
-        editor.getSession().on("changeAnnotation", function(){
-            var annot = editor.getSession().getAnnotations();
-            oExecuter.setAnnotations(annot);
-        });
-        
+};
+    
+    /*
         if(sStored && fromstorage)
         {
              editor.setValue(sStored); // or session.setValue
@@ -301,4 +255,4 @@ $( document ).ready(function() {
         //tincan.sendStatement(defaultStatement);
     }
     
-});
+});*/
