@@ -7,7 +7,6 @@ editor.setShowPrintMargin(false);
 
 // Boo Hiss Globals.
 var intervalID = 0;
-var currentExercise = 0;
 
 
 var ActiveJavascript = function (){
@@ -17,6 +16,21 @@ var ActiveJavascript = function (){
     this.dExerciseLoader = $.getJSON("dist/exercises.json", {}, function(data){
         this.aExercises = data;    
         //console.log("this.aExercises =", this.aExercises);
+        
+        // TODO : #19 Subject order
+        /*what do we do when someone just turns up
+            how do we introduce different subjects without being codecadamey
+            Can we show easier subjects (and their starters?) and the ones we have done (but why or maybe our scores on ones we have done)
+            What does score mean / for?*/
+        
+            
+        //Build a running order maybe this goes into the grunt eventually and it builds the exercises just for one subejct??    
+        for(sEx in this.aExercises) {
+        
+        
+        
+        }
+            
     }.bind(this));
     
     this.aLRSConf = false;
@@ -46,11 +60,7 @@ var ActiveJavascript = function (){
         var thisEx = this.aExercises[this.sExercise];
         
         this.oExercise = new Exercise(thisEx, this.sExercise);
-        
-        this.oExercise.setLevel(this.oStudent.sWorkingGrade);
-        $("#taskleveltext").html(this.oStudent.getNameForGrade(this.oExercise.iLevel));
-
-        
+        this.oExercise.setStudent(this.oStudent);
         
         editor.getSession().on("changeAnnotation", function(){
             var annot = editor.getSession().getAnnotations();
@@ -120,7 +130,7 @@ var ActiveJavascript = function (){
 
 
 /*
-    
+    // TODO :  #5 ReAdd TinCan & Get it to log attempts 
     tincan = new TinCan (
         {
             recordStores: TinCanRecordStores
@@ -134,61 +144,11 @@ var ActiveJavascript = function (){
         defaultStatement.actor.mbox = localStorage.getItem("tincan_mbox");
     }    
     
-    //findExercise by name    
-    var findExercise = function(sPageHash) {
-        var iExercise = aExercises.findIndex(function(element, index, array) {
-            return sPageHash === element.folder;
-        });
-        
-        if(iExercise === -1) {
-            iExercise = 0;
-        }
-        return iExercise;
-    };
-    
-    //Make it so every call gets fresh info from server
-    var isValidEmail = function(x) {
-        var atpos = x.indexOf("@");
-        var dotpos = x.lastIndexOf(".");
-        if (atpos< 1 || dotpos<atpos+2 || dotpos+2>=x.length) {
-            //alert("Not a valid e-mail address");
-            return false;
-        }
-        return true;
-    };
-    
     var runCode = function(currExercise, bTest){
-        //Exercise.resetUI();
-        $("#output").html("");
-        $("#testoutput").html("");
-        $("#result").html("");
-        $("#simulation").html(currExercise.hSimulation); 
-        window.clearInterval(intervalID);
-        
-        //Auto save
-        var code = editor.getValue();
-        localStorage.setItem("code_"+currExercise.folder, code);
-        
-        oExecuter.setTest(bTest);
-                
-        oExecuter.execute();
-        oExecuter.resultsToHTML();
-        var aTinOut = oExecuter.resultsToTinCan();
-        var bSuccess = oExecuter.getSuccess();
-        console.log("bSuccess =", bSuccess);
-        
+    
+
+    
         if(bTest) {
-            var sEmail = defaultStatement.actor.mbox;
-            while(!isValidEmail(sEmail)) {
-                sEmail = prompt("Your school email address", "");
-            }
-            if(sEmail !== defaultStatement.actor.mbox ) {
-                field.value = sEmail;
-                localStorage.setItem("tincan_mbox", sEmail);
-                defaultStatement.actor.mbox = sEmail;
-            }
-
-
             var endStatement = defaultStatement; 
             if(bSuccess) {                   
                 endStatement.verb = {
@@ -253,77 +213,7 @@ var ActiveJavascript = function (){
             // TODO : send to tincan for every try
         }  
     };
-        
-    var setExercise = function(iX, fromstorage) {
-        var currExercise = aExercises[iX];
-        currentExercise = iX;
-        if(typeof fromstorage === "undefined") {
-            fromstorage = true;
-        }
-        
-        $("title").text("Active Javascript : " + currExercise.name);
-        $("h1").text("Active Javascript : " + currExercise.name);
-        $("#task").load("exercises/"+currExercise.folder+"/task.html");    
-        $("#simulation").load("exercises/"+currExercise.folder+"/simulation.html");
-        
-        currExercise.hSimulation = $("#simulation").html();
-        
-        $("#output").html("");
-        $("#testoutput").html("");
-        $("#result").html("");
-        $("#next").hide();
-        $("#start").off("click");
-        
-        var sStored = localStorage.getItem("code_"+currExercise.folder);
-        //console.log("currExercise.folder =", currExercise.folder);
-        
-        
-        $.get("exercises/"+currExercise.folder+"/tests.js", {}, function(testscript){
-                oExecuter.setTestScript(testscript);
-                
-        }, "html");
-                
-        $.get("exercises/"+currExercise.folder+"/context.js", {}, function(contextscript){
-                oExecuter.setContextScript(contextscript);
-                
-        }, "html");     
-                    
-        editor.getSession().on("changeAnnotation", function(){
-            var annot = editor.getSession().getAnnotations();
-            oExecuter.setAnnotations(annot);
-        });
-        
-        if(sStored && fromstorage)
-        {
-             editor.setValue(sStored); // or session.setValue
-             editor.navigateFileStart();
-        } else {
-            $.get("exercises/"+currExercise.folder+"/initial.js", {}, function(data){   
-                 editor.setValue(data); // or session.setValue
-                 editor.navigateFileStart();
-            }, "html");
-        }
-        
-        
-        $("#run").off("click").click(function(){runCode(currExercise, false);});
-        $("#runtest").off("click").click(function(){runCode(currExercise, true);});
-        
-        oExecuter = new Executer; 
-        oExecuter.setCode(editor.getValue());
-        runCode(currExercise, false);
-    };
     
-    $("#reset").click(function(){
-        var sPageHash = window.location.hash.replace("#","");
-        var iExercise = findExercise(sPageHash);
-        setExercise(iExercise, false);
-    });
-    
-    $("#reload").click(function(){
-        var sPageHash = window.location.hash.replace("#","");
-        var iExercise = findExercise(sPageHash);
-        setExercise(iExercise, true);
-    });
     
     
     aExercises.forEach(function logArrayElements(element, index, array) {
@@ -344,27 +234,12 @@ var ActiveJavascript = function (){
         setExercise(iNew);
     });
     
-    var sPageHash = window.location.hash.replace("#","");
-    
-    var iExercise = findExercise(sPageHash);
-    setExercise(iExercise);
-    
-    var field = document.getElementById("tincanemail");
-    
-    if (localStorage.getItem("tincan_mbox")) {
-        field.value = localStorage.getItem("tincan_mbox");
-    }
     
     field.addEventListener("change", function() {
             localStorage.setItem("tincan_mbox", field.value);
             defaultStatement.actor.mbox = localStorage.getItem("tincan_mbox");
     });    
     
-    
-        
-    if(defaultStatement.actor.mbox.length) {
-        //tincan.sendStatement(defaultStatement);
-    }
     
 });*/
 

@@ -4,19 +4,45 @@ var Exercise = function (aData, sExercise){
     this.aData = aData;
     this.oLevel = {};
     this.sExercise = sExercise;
+    this.oStudent = false;
+    
+    // TODO : library loading
+    // TODO : info cascading (probably with a flag)
     
     this.loadLevel = function() {
         if(!this.aData.hasOwnProperty(this.iLevel)) {
-            console.log("no level "+this.iLevel)
-            return false;
+            console.log("No Level "+this.iLevel + " Found");
+            var i = this.iLevel;
+            var bSearching = true;
+            while (i > 0 && bSearching) {
+                i = i - 5;
+                bSearching = !this.aData.hasOwnProperty(i);
+            } 
+            if( bSearching === this.iLevel) {
+                i = this.iLevel;
+                while (i <= 100 && bSearching) {
+                    i = i - 5;
+                    bSearching = !this.aData.hasOwnProperty(i);
+                } 
+            }
+            if(this.aData.hasOwnProperty(i)) {
+                this.iLevel = i; 
+                console.log("Found Level "+i);
+            } else {
+                return false;
+            }
         }
         this.oLevel = this.aData[this.iLevel];
+        console.log("this.oLevel =", this.oLevel);
         this.resetGUI();
         //$("#start").off("click");
         this.oExecuter = new Executer(this.aData.tests, this.aData.context);
+        //console.log("this.aData =", this.aData);
         
         this.loadEditorContent();
         $("#taskname").html(this.aData.info.name);
+        $("#taskleveltext").html(this.oLevel.info.verb.display["en-GB"]);
+
     };
     
     this.resetGUI =function () {
@@ -37,12 +63,24 @@ var Exercise = function (aData, sExercise){
         editor.navigateFileStart();
     };
     
+    
     this.getCodeLocalStoreageKey = function() {
-        return "active-" + this.sExercise + "-" + this.iLevel;
+        var sStudent = "";
+        if (this.oStudent !== false) {
+            sStudent = this.oStudent.sEmail+"-";
+        }
+        return "active-" + sStudent + this.sExercise + "-" + this.iLevel;
+    };
+    
+    this.setStudent = function (oStudent) {
+        this.oStudent = oStudent;
+        this.setLevel(this.oStudent.sWorkingGrade);
+        //$("#taskleveltext").html(this.oStudent.getNameForGrade(this.iLevel));
+
     };
     
     this.reloadEditorContent = function () {
-        console.log("this.reloadEditorContent =", this.reloadEditorContent);
+        //console.log("this.reloadEditorContent =", this.reloadEditorContent);
         // TODO : add student to the key?
         var sKey = this.getCodeLocalStoreageKey();
         var sLocalCode = localStorage.getItem(sKey);
@@ -83,10 +121,10 @@ var Exercise = function (aData, sExercise){
         
         //Auto save
         var code = editor.getValue();
-        console.log("code =", code);
+        //console.log("code =", code);
         if(bTest) {
             var sKey = this.getCodeLocalStoreageKey();
-            console.log("sKey =", sKey);
+            //console.log("sKey =", sKey);
             localStorage.setItem(sKey, code);
         }
         
@@ -94,26 +132,35 @@ var Exercise = function (aData, sExercise){
         this.oExecuter.setTest(bTest);
                 
         this.oExecuter.execute();
-        console.log("this.oExecuter =", this.oExecuter);
+        //console.log("this.oExecuter =", this.oExecuter);
         // TODO : move resultsToHTML to exercise
         this.oExecuter.resultsToHTML();
         
-        //var aTinOut = oExecuter.resultsToTinCan();
         var bSuccess = this.oExecuter.getSuccess();
-        console.log("bSuccess =", bSuccess);
-        /*
+        //console.log("bSuccess =", bSuccess);
+        
         if(bTest) {
-            var sEmail = defaultStatement.actor.mbox;
-            while(!isValidEmail(sEmail)) {
-                sEmail = prompt("Your school email address", "");
-            }
-            if(sEmail !== defaultStatement.actor.mbox ) {
-                field.value = sEmail;
-                localStorage.setItem("tincan_mbox", sEmail);
-                defaultStatement.actor.mbox = sEmail;
-            }
-
-
+            var aTinOut = oExecuter.resultsToTinCan();
+            if(bSuccess) {                   
+                // TODO : send a completed for the exercise with score
+                
+                // TODO : send a blooms statment for each object 
+                // TODO : (eventually we may need to move the objects down to the levels so other providers can have their own verbs)
+                
+                // In the page (using an event on the exercise??)  :-
+                // TODO : Success message (modal??) and continue button
+                // TODO : work out the next exercise
+                // TODO : load the next one
+                // TODO : use a deffered 
+                
+            } else {
+                // TODO : send an attempted
+                // TODO : increment attempt counter
+                // TODO : anayze errors and show hints
+                // TODO : if struggling (say 5 attempts at this level  suggest the make easier)
+            }    
+            
+            /*
             var endStatement = defaultStatement; 
             if(bSuccess) {                   
                 endStatement.verb = {
@@ -121,7 +168,7 @@ var Exercise = function (aData, sExercise){
                      "display": {"en-GB": "completed"}
                 };
                 
-                endStatement.result = {
+                endStatement.result = {jquery
                     "completion": true,
                     "success": true,
                     "score": {
@@ -173,48 +220,16 @@ var Exercise = function (aData, sExercise){
             if(defaultStatement.actor.mbox.length) {
                 tincan.sendStatement(endStatement);
             }        
-        
+            */
             // TODO : add attempt counts
             // TODO : send to tincan for every try
         } 
-        */
+        
     };
 };
     
     /*
-        if(sStored && fromstorage)
-        {
-             editor.setValue(sStored); // or session.setValue
-             editor.navigateFileStart();
-        } else {
-            $.get("exercises/"+currExercise.folder+"/initial.js", {}, function(data){   
-                 editor.setValue(data); // or session.setValue
-                 editor.navigateFileStart();
-            }, "html");
-        }
-        
-        
-        $("#run").off("click").click(function(){runCode(currExercise, false);});
-        $("#runtest").off("click").click(function(){runCode(currExercise, true);});
-        
-        oExecuter = new Executer; 
-        oExecuter.setCode(editor.getValue());
-        runCode(currExercise, false);
-    };
-    
-    $("#reset").click(function(){
-        var sExerciseHash = window.location.hash.replace("#","");
-        var iExercise = findExercise(sExerciseHash);
-        setExercise(iExercise, false);
-    });
-    
-    $("#reload").click(function(){
-        var sExerciseHash = window.location.hash.replace("#","");
-        var iExercise = findExercise(sExerciseHash);
-        setExercise(iExercise, true);
-    });
-    
-    
+     
     aExercises.forEach(function logArrayElements(element, index, array) {
         var li = document.createElement('li');
         var a = document.createElement('a');
@@ -237,22 +252,5 @@ var Exercise = function (aData, sExercise){
     
     var iExercise = findExercise(sExerciseHash);
     setExercise(iExercise);
-    
-    var field = document.getElementById("tincanemail");
-    
-    if (localStorage.getItem("tincan_mbox")) {
-        field.value = localStorage.getItem("tincan_mbox");
-    }
-    
-    field.addEventListener("change", function() {
-            localStorage.setItem("tincan_mbox", field.value);
-            defaultStatement.actor.mbox = localStorage.getItem("tincan_mbox");
-    });    
-    
-    
-        
-    if(defaultStatement.actor.mbox.length) {
-        //tincan.sendStatement(defaultStatement);
-    }
     
 });*/
