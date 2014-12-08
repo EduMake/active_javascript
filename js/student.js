@@ -85,7 +85,7 @@ var Student = function (sFormSelector){
         var oStudent = {};
         oStudent.sWorkingGrade = $("#student_workinggrade").val();
         oStudent.sEmail        = $("#student_email").val();
-        console.log("oStudent =", oStudent);
+        //console.log("oStudent =", oStudent);
         if(this.isValidEmail(oStudent.sEmail) === false) {
             console.log("not valid email");
             return false;

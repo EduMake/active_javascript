@@ -2,7 +2,17 @@ module.exports = function(grunt) {
 
   // Project configuration.
   grunt.initConfig({
-    dir2json: {
+    watch: {
+        scripts: {
+          files: ['exercises/**/**'],
+          //exclude: '**/*~',
+          tasks: ['dir2json'],
+          options: {
+            spawn: false
+          }
+        }
+      },
+      dir2json: {
         options: {
             exclude: '**/*~'
         },
@@ -15,7 +25,7 @@ module.exports = function(grunt) {
 
   // Load the plugin that provides the "uglify" task.
   grunt.loadNpmTasks('grunt-dir2json');
-
+  grunt.loadNpmTasks('grunt-contrib-watch');
   // Default task(s).
   grunt.registerTask('default', ['dir2json']);
 

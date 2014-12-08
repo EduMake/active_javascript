@@ -30,6 +30,8 @@ var Boiler = GET("boiler");
 
 //CODE//
 
+
+
 function loop() {
     MinTemp = INPUT("mintemp");
     MaxTemp = INPUT("maxtemp");
@@ -39,6 +41,11 @@ function loop() {
     OUTPUT("boiler", Boiler);
 }
 
+
+
+function stop(){
+    window.clearInterval(intervalID);
+}
 
 
 function _loop(){
@@ -73,17 +80,13 @@ function main(){
   intervalID = window.setInterval(_loop, 1000);
 }
 
-
-function stop(){
-    window.clearInterval(intervalID);
-}
-
 function run() {
     stop();
     $("#output").html("");
     main();
 }
 
+//TESTS//
 
 $("#start").click(run);
 $("#stop").click(stop);
