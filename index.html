@@ -22,9 +22,14 @@
             <button id="reload">Reload Last Tested Code</button>
             <button id="reset">Reset to Intial</button>
             <button id="easier">Make Easier</button>
+            <button id="wrapping">Wrapping On</button>
         </div>
         <div id="taskbox">
-            <h2>Task - <span id="taskname"></span> - <span id="taskleveltext"></span></h2>
+            <h3>
+                <span id="tasklabel"></span>: 
+                <span id="taskname"></span>:
+                <span id="taskleveltext"></span>
+            </h3>
             <ol id="task"></ol>
             <ul>
                 <li>Click "Test Code" when you think you might have finished (or you are stuck), to try your new code.</li>
@@ -50,6 +55,13 @@
             <a href="" id="next">Next Exercise</a>
         </div>
         </body>
+        
+        <div id="exercise_end"   style="display:none;" title="Well Done">
+            <h2>Well Done</h2>
+            
+            <!--<button id="tryagain" >Try Again But Harder</button>-->
+            <button id="nextexercise">Next Exercise</button>
+        </div>
         
         <div id="student-details-form"  style="display:none;" title="Please Sign In">
             <p >Please use your school email address, and your current working grade from your book.</p>
@@ -82,6 +94,8 @@
         <script src="js/student.js" charset="utf-8"></script>
         <script src="js/exercise.js" charset="utf-8"></script>
         <script src="js/executer.js" charset="utf-8"></script>
+        
+        <script src="js/tincanfactory.js" charset="utf-8"></script>
         <script src="js/active_javascript.js" charset="utf-8"></script>
 
     </body>

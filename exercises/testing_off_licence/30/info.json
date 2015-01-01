@@ -1,6 +1,7 @@
 {
     "verb":{
-        "id": "http://www.edumake.org/blooms/fixed??/",
-        "display": {"en-GB": "fixed"}
-    }
+        "id": "http://utc-sheffield.github.io/taxonomy/doing/debuged/",
+        "display": {"en-GB": "debuged"}
+    },
+    "label":"Debug"
 }

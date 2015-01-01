@@ -5,6 +5,7 @@ var Exercise = function (aData, sExercise){
     this.oLevel = {};
     this.sExercise = sExercise;
     this.oStudent = false;
+    this.aAttempts = {};
     
     // TODO : library loading
     // TODO : info cascading (probably with a flag)
@@ -15,17 +16,17 @@ var Exercise = function (aData, sExercise){
             var i = this.iLevel;
             var bSearching = true;
             while (i > 0 && bSearching) {
-                i = i - 5;
-                bSearching = !this.aData.hasOwnProperty(i);
+                i -= 5;
+                bSearching = !this.aData.hasOwnProperty(""+i);
             } 
             if( bSearching === this.iLevel) {
                 i = this.iLevel;
                 while (i <= 100 && bSearching) {
-                    i = i - 5;
-                    bSearching = !this.aData.hasOwnProperty(i);
+                    i += 5;
+                    bSearching = !this.aData.hasOwnProperty(""+i);
                 } 
             }
-            if(this.aData.hasOwnProperty(i)) {
+            if(this.aData.hasOwnProperty(""+i)) {
                 this.iLevel = i; 
                 console.log("Found Level "+i);
             } else {
@@ -40,8 +41,9 @@ var Exercise = function (aData, sExercise){
         //console.log("this.aData =", this.aData);
         
         this.loadEditorContent();
+        $("#tasklabel").html(this.oLevel.info.label);
         $("#taskname").html(this.aData.info.name);
-        $("#taskleveltext").html(this.oLevel.info.verb.display["en-GB"]);
+        $("#taskleveltext").html(this.oStudent.getNameForGrade(this.iLevel));
 
     };
     
@@ -74,7 +76,7 @@ var Exercise = function (aData, sExercise){
     
     this.setStudent = function (oStudent) {
         this.oStudent = oStudent;
-        this.setLevel(this.oStudent.sWorkingGrade);
+        this.setLevel(5 + parseInt(this.oStudent.sWorkingGrade, 10));
         //$("#taskleveltext").html(this.oStudent.getNameForGrade(this.iLevel));
 
     };
@@ -140,8 +142,21 @@ var Exercise = function (aData, sExercise){
         //console.log("bSuccess =", bSuccess);
         
         if(bTest) {
-            var aTinOut = oExecuter.resultsToTinCan();
-            if(bSuccess) {                   
+            if(!this.aAttempts.hasOwnProperty(""+this.iLevel)) {
+                this.aAttempts[""+this.iLevel] = 0;
+            }
+            this.aAttempts[""+this.iLevel] ++;
+            
+            var aTinOut = this.oExecuter.resultsToTinCan();
+            console.log("aTinOut =", aTinOut);
+            if(bSuccess) {
+                
+                $.event.trigger({
+                        type: "exerciseTestSuccess",
+                        aAttempts: this.aAttempts,
+                        iLevel: this.iLevel,
+                        aTinOut: aTinOut
+                    });
                 // TODO : send a completed for the exercise with score
                 
                 // TODO : send a blooms statment for each object 
@@ -154,6 +169,14 @@ var Exercise = function (aData, sExercise){
                 // TODO : use a deffered 
                 
             } else {
+                
+                $.event.trigger({
+                        type: "exerciseTestFail",
+                        aAttempts: this.aAttempts,
+                        iLevel: this.iLevel,
+                        aTinOut: aTinOut
+                        
+                    });
                 // TODO : send an attempted
                 // TODO : increment attempt counter
                 // TODO : anayze errors and show hints
@@ -168,7 +191,7 @@ var Exercise = function (aData, sExercise){
                      "display": {"en-GB": "completed"}
                 };
                 
-                endStatement.result = {jquery
+                endStatement.result = {
                     "completion": true,
                     "success": true,
                     "score": {

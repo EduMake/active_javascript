@@ -1,7 +1,7 @@
 {
-        "name":"Student Array",
+        "name":"Homophones",
         "tags":["array"],
-        "default":true,
+        "default":false,
         "objects": ["http://utc-sheffield.github.io/tincan_curriculum/OCR_GCSE_Computing_2012/#2-1-7-O"],
         "towards": []
 }

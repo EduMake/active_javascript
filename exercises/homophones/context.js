@@ -22,12 +22,30 @@ function GET(ControlName) {
 //var MinTemp = INPUT("mintemp");
 
 
-function main(){
 //CODE//
-}
+
 
 //TESTS//
 
+
+function findHomophones2(aWords){
+    return aWords.filter(isHomophone);
+}
+
+
+function main() {
+    var sText = $("#text").html().trim([" ","\n"]);    
+    var aWords = sText.split(/\W/);
+    
+    var aFoundWords =  findHomophones(aWords);
+
+    for(var i = 0; i < aFoundWords.length; i++) {
+        var sWord = aFoundWords[i];
+        //var sPattern = new RegExp("\W"+sWord+"\W"
+        sText = sText.replace(sWord, '<span class="homophone">'+sWord+'</span>');
+    }
+    $("#text").html(sText);
+}
 
 function run() {
     stop();
@@ -38,5 +56,5 @@ function run() {
 
 $("#start").click(run);
 //$("#stop").click(stop);
-main();
+//main();
 
