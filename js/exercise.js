@@ -34,7 +34,6 @@ var Exercise = function (aData, sExercise){
             }
         }
         this.oLevel = this.aData[this.iLevel];
-        console.log("this.oLevel =", this.oLevel);
         this.resetGUI();
         //$("#start").off("click");
         this.oExecuter = new Executer(this.aData.tests, this.aData.context);
@@ -55,7 +54,6 @@ var Exercise = function (aData, sExercise){
         $("title").text("Active Javascript : " + this.aData.info.name);
         $("h1").text("Active Javascript : " + this.aData.info.name);
         $("#task").html(this.oLevel.task);    
-        
         $("#next").hide();
         
     };
@@ -82,8 +80,6 @@ var Exercise = function (aData, sExercise){
     };
     
     this.reloadEditorContent = function () {
-        //console.log("this.reloadEditorContent =", this.reloadEditorContent);
-        // TODO : add student to the key?
         var sKey = this.getCodeLocalStoreageKey();
         var sLocalCode = localStorage.getItem(sKey);
         if(sLocalCode) {
@@ -123,10 +119,8 @@ var Exercise = function (aData, sExercise){
         
         //Auto save
         var code = editor.getValue();
-        //console.log("code =", code);
         if(bTest) {
             var sKey = this.getCodeLocalStoreageKey();
-            //console.log("sKey =", sKey);
             localStorage.setItem(sKey, code);
         }
         
@@ -134,12 +128,10 @@ var Exercise = function (aData, sExercise){
         this.oExecuter.setTest(bTest);
                 
         this.oExecuter.execute();
-        //console.log("this.oExecuter =", this.oExecuter);
         // TODO : move resultsToHTML to exercise
         this.oExecuter.resultsToHTML();
         
         var bSuccess = this.oExecuter.getSuccess();
-        //console.log("bSuccess =", bSuccess);
         
         if(bTest) {
             if(!this.aAttempts.hasOwnProperty(""+this.iLevel)) {
@@ -148,7 +140,6 @@ var Exercise = function (aData, sExercise){
             this.aAttempts[""+this.iLevel] ++;
             
             var aTinOut = this.oExecuter.resultsToTinCan();
-            console.log("aTinOut =", aTinOut);
             if(bSuccess) {
                 
                 $.event.trigger({
@@ -157,16 +148,6 @@ var Exercise = function (aData, sExercise){
                         iLevel: this.iLevel,
                         aTinOut: aTinOut
                     });
-                // TODO : send a completed for the exercise with score
-                
-                // TODO : send a blooms statment for each object 
-                // TODO : (eventually we may need to move the objects down to the levels so other providers can have their own verbs)
-                
-                // In the page (using an event on the exercise??)  :-
-                // TODO : Success message (modal??) and continue button
-                // TODO : work out the next exercise
-                // TODO : load the next one
-                // TODO : use a deffered 
                 
             } else {
                 
@@ -177,103 +158,7 @@ var Exercise = function (aData, sExercise){
                         aTinOut: aTinOut
                         
                     });
-                // TODO : send an attempted
-                // TODO : increment attempt counter
-                // TODO : anayze errors and show hints
-                // TODO : if struggling (say 5 attempts at this level  suggest the make easier)
             }    
-            
-            /*
-            var endStatement = defaultStatement; 
-            if(bSuccess) {                   
-                endStatement.verb = {
-                     "id": "http://adlnet.gov/expapi/verbs/completed",
-                     "display": {"en-GB": "completed"}
-                };
-                
-                endStatement.result = {
-                    "completion": true,
-                    "success": true,
-                    "score": {
-                        "scaled": 1
-                    }
-                };
-            
-                
-                
-                var sExtra = "";
-                var next = currentExercise + 1;
-                
-                if(next < aExercises.length) {
-                    //sExtra = "<a href='#"+aExercises[next].folder+"'>Next</a>";
-                    var newHash = "#"+aExercises[next].folder;
-                    $("#next").attr("href", newHash);
-                    $("#next").off("click").click(function(){
-                         setExercise(next, true);
-                    }).show();
-                    
-                } else if (next === aExercises.length) {
-                    sExtra = "<h2>You have finished</h2>"
-                }
-                
-                $("#result").html("Well done. Your code passed all the tests.<br>"+sExtra);
-                
-                
-                
-            } else {
-                $("#result").html("Please Try Again : Check the test results to work out what to do.");
-                
-                endStatement.verb = {
-                     "id": "http://www.adlnet.gov/expapi/verbs/attempted/",
-                     "display": {"en-GB": "attempted"}
-                };
-                
-                endStatement.result = {
-                    "completion": false,
-                    "success": false,
-                    "score": {
-                        "scaled": 0
-                    }
-                };
-            
-                
-            }
-            
-            //console.log("endStatement =", endStatement);
-            if(defaultStatement.actor.mbox.length) {
-                tincan.sendStatement(endStatement);
-            }        
-            */
-            // TODO : add attempt counts
-            // TODO : send to tincan for every try
         } 
-        
     };
 };
-    
-    /*
-     
-    aExercises.forEach(function logArrayElements(element, index, array) {
-        var li = document.createElement('li');
-        var a = document.createElement('a');
-        a.href = "#"+element.folder;
-        a.appendChild( document.createTextNode( element.name ) ); 
-        
-        li.appendChild( a ); 
-        var eList = $("#exercise_list");
-        eList.append(li);
-    });
-
-    var listitems = $("#exercise_list li a");
-    listitems.off("click").click(function(){
-        var parts = this.href.split("#");
-        var iNew = findExercise(parts[1]);
-        setExercise(iNew);
-    });
-    
-    var sExerciseHash = window.location.hash.replace("#","");
-    
-    var iExercise = findExercise(sExerciseHash);
-    setExercise(iExercise);
-    
-});*/

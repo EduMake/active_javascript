@@ -19,7 +19,6 @@ var Executer = function (sTestScript, sContextScript){
         var iErrors = 0; 
         this.bSyntaxErrors = false;
         this.aTests = this.aAnnotations.filter(function(err){
-                //console.log("err =", err);
                 if(err.type === "error") {//   || err.type === "warning") {
                     iErrors ++;
                 }
@@ -35,10 +34,8 @@ var Executer = function (sTestScript, sContextScript){
     
     
     this.setAnnotations = function(aAnnotations) {
-        //console.log("aAnnotations =", aAnnotations);
         var aRows = [];
         this.aAnnotations = aAnnotations.map(function(oAnno){
-            //console.log("aRows =", aRows);
             oAnno.pass = (oAnno.type === "error")?false:true;
             oAnno.label = (oAnno.type === "error")?"Error":"Warning";
             oAnno.keep = aRows.indexOf(oAnno.row) === -1;
@@ -70,13 +67,10 @@ var Executer = function (sTestScript, sContextScript){
     
     this.execute = function(){
         window.clearInterval(intervalID);
-        //console.log("intervalID =", intervalID);
-        //console.log("this.execute");
         this.calcAnnoErrors();
         this.checkReady();
         if (!this.bRunnable) {
-            console.log("Not bRunnable this.bRunnable =", this.bRunnable, "this.bAnnotations =", this.bAnnotations, "this.sCode.length =", this.sCode.length,            "this.sTestScript.length =", this.sTestScript.length,"this.sContextScript.length =", this.sContextScript.length, "this.bFirstRun =", this.bFirstRun, "this.bReady =", this.bReady,"this.bRunnable =", this.bRunnable);
-        
+            //console.log("Not bRunnable this.bRunnable =", this.bRunnable, "this.bAnnotations =", this.bAnnotations, "this.sCode.length =", this.sCode.length,            "this.sTestScript.length =", this.sTestScript.length,"this.sContextScript.length =", this.sContextScript.length, "this.bFirstRun =", this.bFirstRun, "this.bReady =", this.bReady,"this.bRunnable =", this.bRunnable);
             return false;
         } else {
             console.log("Running");
@@ -89,7 +83,6 @@ var Executer = function (sTestScript, sContextScript){
             this.aTests = this.aTests.concat(aTests);
         
         } catch (e){
-            console.log("e =", e);
             if (e instanceof TypeError) {
                 // statements to handle TypeError exceptions
             } else if (e instanceof RangeError) {
@@ -103,18 +96,14 @@ var Executer = function (sTestScript, sContextScript){
             var err = {keep:true, type:"error",text:e.message, label:"Error", pass:false, row:false };
             this.aTests.push(err);
         }
-        
-        //console.log("aTests =", aTests);
-        console.log("this.aTests =", this.aTests);
+       
     };
     
     
     
     this.resultsToHTML = function(){
-        //console.log("this.resultsToHTML this.aTests =", this.aTests);
         if(this.aTests.length) {
             this.aTests.forEach(function(oMess, iKey) {
-                //console.log("oMess =", oMess);
                 var li = document.createElement('li');
                 li.className = oMess.label.toLowerCase();
                 
@@ -141,7 +130,6 @@ var Executer = function (sTestScript, sContextScript){
                 text: oTest.text,
                 type: oTest.type
             };
-            console.log("oTest =", oTest);
             return oTest;
         
         });
