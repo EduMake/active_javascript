@@ -16,7 +16,6 @@ var ActiveJavascript = function (){
     this.oTinCan = false;
     this.dExerciseLoader = $.getJSON("dist/exercises.json", {}, function(data){
         this.aExercises = data;    
-        //console.log("this.aExercises =", this.aExercises);
         
         // TODO : #19 Subject order
         /*what do we do when someone just turns up
@@ -25,44 +24,11 @@ var ActiveJavascript = function (){
             What does score mean / for?*/
         
             
-        //Build a running order maybe this goes into the grunt eventually and it builds the exercises just for one subejct??    
-        var aRunningOrder = [];
-        for(var sEx in this.aExercises) {
-            console.log("this.aExercises =", this.aExercises);
-            var aExercise = this.aExercises[sEx];
-            var aEx = { 
-                sExercise: sEx,
-                sObject:aExercise.info.objects[0],
-                bDefault:aExercise.info["default"],
-                sTitle:aExercise.info["name"]
-                //aLevels
-            };
-            //console.log("aEx =", aEx);
-            aRunningOrder.push(aEx);
-        }
-        
-        //console.log("aRunningOrder =", aRunningOrder);
-        aRunningOrder.sort(function(a, b){
-            var iSort = a.sObject.localeCompare(b.sObject);
-            if(iSort === 0) {
-               if( a.bDefault) {
-                return -1;
-               }
-               //use student email to seed random????
-               //return this.oStudent.sEmail
-               return Math.random();
-            }
-            return iSort;
-        });
-        
-        console.log("sorted aRunningOrder =", aRunningOrder);
-            
     }.bind(this));
     
     this.aLRSConf = false;
     this.dLRSLoader = $.getJSON("lrs_config.json", {}, function(data){
         this.aLRSConf = data;    
-        console.log("this.aLRSConf =", this.aLRSConf);
     }.bind(this));
     
     
@@ -72,16 +38,56 @@ var ActiveJavascript = function (){
     this.parseURL = function() {
          this.sPageHash = window.location.hash.replace("#","");
          this.sSite = window.location.href.replace(window.location.search, "").replace(window.location.hash, "");
-         //console.log("this.sSite =", this.sSite);
     };
     
+    this.createRunningOrder = function() {
+    //Build a running order maybe this goes into the grunt eventually and it builds the exercises just for one subejct??    
+        var aRunningOrder = [];
+        Math.seedrandom(this.oStudent.sEmail);
+        for(var sEx in this.aExercises) {
+            var aExercise = this.aExercises[sEx];
+            var aEx = { 
+                sExercise: sEx,
+                sObject:aExercise.info.objects[0],
+                bDefault:aExercise.info["default"],
+                sTitle:aExercise.info["name"],
+                fRandom:Math.random()
+                //aLevels
+            };
+            aRunningOrder.push(aEx);
+        }
+        
+        //console.log("aRunningOrder =", aRunningOrder);
+        aRunningOrder.sort(function(a, b){
+            var iSort = a.sObject.localeCompare(b.sObject);
+            if(iSort === 0) {
+                if( a.bDefault) {
+                    return -1;
+                }
+                //use student email to seed random????
+                //return this.oStudent.sEmail
+                if (a.fRandom > b.fRandom) {
+                    return 1;
+                }
+                if (a.fRandom < b.fRandom) {
+                    return -1;
+                }
+                // a must be equal to b
+                return 0;
+            }
+            return iSort;
+        });
+        this.aRunningOrder = aRunningOrder;
+    };
     
     this.whenLoaded = function() {
+        this.createRunningOrder();
+        
         this.parseURL();
         if(this.aExercises.hasOwnProperty(this.sPageHash)) {
             this.sExercise = this.sPageHash;
         } else {
-            this.sExercise = this.sDefaultExercise;
+            this.sExercise = this.aRunningOrder[0].sExercise;
         }
         
         var thisEx = this.aExercises[this.sExercise];
@@ -96,7 +102,6 @@ var ActiveJavascript = function (){
         
         editor.getSession().on("changeAnnotation", function(){
             var annot = editor.getSession().getAnnotations();
-            //console.log("annot =", annot);
             this.oExercise.oExecuter.setAnnotations(annot);
         }.bind(this));
         
@@ -112,7 +117,6 @@ var ActiveJavascript = function (){
         $("#wrapping").off("click").click(function(){
                 
             var bOld = editor.getSession().getUseWrapMode();//editor.getWrapBehavioursEnabled();
-            console.log("bOld =", bOld);
             editor.getSession().setUseWrapMode(!bOld);
             $("#wrapping").html("Wrapping "+(bOld?"On":"Off"));
         });
@@ -146,10 +150,8 @@ var ActiveJavascript = function (){
     
             
     var onTestSuccess = function (ev) {
-        console.log("ev =", ev);
         // TODO : send a completed for the exercise with score
         var sGrade = this.oStudent.getNameForGrade(ev.iLevel);
-        console.log("sGrade =", sGrade);
         var sResponse = JSON.stringify({"attempts":ev.aAttempts, "code":ev.sCode});
         var oResult = {
                     "completion": true,
@@ -171,10 +173,7 @@ var ActiveJavascript = function (){
             oResult);
         this.oTinCan.sendStatement(oStatement);
         
-        console.log("this.oExercise =", this.oExercise);
         // TODO : (eventually we may need to move the objects down to the levels so other providers can have their own verbs)
-        
-        
         // TODO : Success message (modal??) and continue button
         $("#exercise_end").modal({
             escapeClose: false,
@@ -190,11 +189,7 @@ var ActiveJavascript = function (){
     };
     
     var onTestFail = function (ev) {
-        console.log("ev =", ev);
-        
-        //console.log("Fail this.aLRSConf =", this.aLRSConf);
         var sResponse = JSON.stringify({"fails":ev.aTinOut, "code":ev.sCode});
-        console.log("sResponse =", sResponse);
         var oResult = {
                     "completion": false,
                     "success": false,
