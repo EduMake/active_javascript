@@ -78,7 +78,6 @@ var Student = function (sFormSelector){
             clickClose: false,
             showClose: false
         });
-        
     };
     
     $("#student_save").click(function(){

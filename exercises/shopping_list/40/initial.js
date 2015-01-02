@@ -1,12 +1,10 @@
 function calcBoilerStatus(MinTemp, MaxTemp, AirTemp, Status) {
     if(AirTemp < MinTemp) {
         Status = "ON";
-    } else 
-        if(AirTemp > MaxTemp); {
-            Status = "OFF";
-        }
+    } else {
+        //Your code should go here
     }
-    return Stratus;
+    return Status;
 }
 
 

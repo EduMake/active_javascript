@@ -17,9 +17,10 @@ var Executer = function (sTestScript, sContextScript){
     this.calcAnnoErrors = function() {
         this.aTests = [];
         var iErrors = 0; 
+        this.bSyntaxErrors = false;
         this.aTests = this.aAnnotations.filter(function(err){
                 //console.log("err =", err);
-                if(err.type === "error") {
+                if(err.type === "error") {//   || err.type === "warning") {
                     iErrors ++;
                 }
                 return err.keep && (err.type === "error" || err.type === "warning");
@@ -31,6 +32,7 @@ var Executer = function (sTestScript, sContextScript){
         }
         
     };
+    
     
     this.setAnnotations = function(aAnnotations) {
         //console.log("aAnnotations =", aAnnotations);
@@ -56,8 +58,6 @@ var Executer = function (sTestScript, sContextScript){
         
         if(this.bTest) {
             script += "var assert = function(outcome, description, type ) {aTests.push({text:description,type:type,label:outcome?'Pass':'Fail',pass:outcome, row: false, col: false});};";
-            //script = "var assert = this.assert;//console.log(\"assert =\", assert);";
-            
         }
         script +=  this.sContextScript.replace("//CODE//", this.sCode);
         if(this.bTest) {
@@ -73,17 +73,39 @@ var Executer = function (sTestScript, sContextScript){
         //console.log("intervalID =", intervalID);
         //console.log("this.execute");
         this.calcAnnoErrors();
+        this.checkReady();
         if (!this.bRunnable) {
             console.log("Not bRunnable this.bRunnable =", this.bRunnable, "this.bAnnotations =", this.bAnnotations, "this.sCode.length =", this.sCode.length,            "this.sTestScript.length =", this.sTestScript.length,"this.sContextScript.length =", this.sContextScript.length, "this.bFirstRun =", this.bFirstRun, "this.bReady =", this.bReady,"this.bRunnable =", this.bRunnable);
         
             return false;
+        } else {
+            console.log("Running");
         }
+        
         var script = this.getExecutionCode();
         var funcCode = new Function(script);
-        var aTests = funcCode();
+        try {
+            var aTests = funcCode();
+            this.aTests = this.aTests.concat(aTests);
+        
+        } catch (e){
+            console.log("e =", e);
+            if (e instanceof TypeError) {
+                // statements to handle TypeError exceptions
+            } else if (e instanceof RangeError) {
+                // statements to handle RangeError exceptions
+            } else if (e instanceof EvalError) {
+                // statements to handle EvalError exceptions
+            } else {
+               // statements to handle any unspecified exceptions
+       //        logMyErrors(e); // pass exception object to error handler
+            }
+            var err = {keep:true, type:"error",text:e.message, label:"Error", pass:false, row:false };
+            this.aTests.push(err);
+        }
+        
         //console.log("aTests =", aTests);
-        this.aTests = this.aTests.concat(aTests);
-        //console.log("this.aTests =", this.aTests);
+        console.log("this.aTests =", this.aTests);
     };
     
     
@@ -111,7 +133,19 @@ var Executer = function (sTestScript, sContextScript){
     };
     
     this.resultsToTinCan = function() {
-        return this.aTests;
+        var aFails = this.aTests.filter(function(oTest){
+            return oTest.pass === false;
+        }).map(function(oTest){
+            var oFail = {
+                pass: oTest.pass,
+                text: oTest.text,
+                type: oTest.type
+            };
+            console.log("oTest =", oTest);
+            return oTest;
+        
+        });
+        return aFails;
     };
     
     this.getSuccess = function() {

@@ -1,9 +1,9 @@
 var editor = ace.edit("editor");
 editor.setTheme("ace/theme/dawn");
 editor.getSession().setMode("ace/mode/javascript");
-editor.setWrapBehavioursEnabled(true);
-editor.setFontSize(16);
+editor.getSession().setUseWrapMode(false);
 editor.setShowPrintMargin(false);
+editor.setFontSize(16);
 
 // Boo Hiss Globals.
 var intervalID = 0;
@@ -13,6 +13,7 @@ var ActiveJavascript = function (){
     this.sDefaultExercise = "central_heating";
     this.sExercise = false;
     this.aExercises = false;
+    this.oTinCan = false;
     this.dExerciseLoader = $.getJSON("dist/exercises.json", {}, function(data){
         this.aExercises = data;    
         //console.log("this.aExercises =", this.aExercises);
@@ -25,17 +26,43 @@ var ActiveJavascript = function (){
         
             
         //Build a running order maybe this goes into the grunt eventually and it builds the exercises just for one subejct??    
-        for(sEx in this.aExercises) {
-        
-        
-        
+        var aRunningOrder = [];
+        for(var sEx in this.aExercises) {
+            console.log("this.aExercises =", this.aExercises);
+            var aExercise = this.aExercises[sEx];
+            var aEx = { 
+                sExercise: sEx,
+                sObject:aExercise.info.objects[0],
+                bDefault:aExercise.info["default"],
+                sTitle:aExercise.info["name"]
+                //aLevels
+            };
+            //console.log("aEx =", aEx);
+            aRunningOrder.push(aEx);
         }
+        
+        //console.log("aRunningOrder =", aRunningOrder);
+        aRunningOrder.sort(function(a, b){
+            var iSort = a.sObject.localeCompare(b.sObject);
+            if(iSort === 0) {
+               if( a.bDefault) {
+                return -1;
+               }
+               //use student email to seed random????
+               //return this.oStudent.sEmail
+               return Math.random();
+            }
+            return iSort;
+        });
+        
+        console.log("sorted aRunningOrder =", aRunningOrder);
             
     }.bind(this));
     
     this.aLRSConf = false;
     this.dLRSLoader = $.getJSON("lrs_config.json", {}, function(data){
         this.aLRSConf = data;    
+        console.log("this.aLRSConf =", this.aLRSConf);
     }.bind(this));
     
     
@@ -62,6 +89,11 @@ var ActiveJavascript = function (){
         this.oExercise = new Exercise(thisEx, this.sExercise);
         this.oExercise.setStudent(this.oStudent);
         
+        this.oTinCan = new TinCanFactory();
+        this.oTinCan.addLRSs(this.aLRSConf);
+        this.oTinCan.setStudent(this.oStudent);
+        
+        
         editor.getSession().on("changeAnnotation", function(){
             var annot = editor.getSession().getAnnotations();
             //console.log("annot =", annot);
@@ -76,6 +108,19 @@ var ActiveJavascript = function (){
             this.oExercise.makeEasier(); 
             $("#taskleveltext").html(this.oStudent.getNameForGrade(this.oExercise.iLevel));
         }.bind(this));
+        
+        $("#wrapping").off("click").click(function(){
+                
+            var bOld = editor.getSession().getUseWrapMode();//editor.getWrapBehavioursEnabled();
+            console.log("bOld =", bOld);
+            editor.getSession().setUseWrapMode(!bOld);
+            $("#wrapping").html("Wrapping "+(bOld?"On":"Off"));
+        });
+        
+        
+        // TODO : Create tincan LRS section
+        // TODO : 
+        
         
         this.oExercise.runCode(false);
     };
@@ -93,35 +138,77 @@ var ActiveJavascript = function (){
         return Math.floor(iGrade / 5) *5;    
     };
     
-    this.loadTinCanConfig = function() {
-        // TODO : does our exerecise add an LRS ?
-        this.defaultStatement = {
-            actor: {
-                mbox: ""
-            },
-            verb: {
-                id: "http://adlnet.gov/expapi/verbs/initialized",
-                "display": {"en-GB": "initialised"}
-            },
-            target: { //Object ???
-                id: window.location.href,
-                type: "http://adlnet.gov/expapi/activities/simulation",
-                definition: {
-                    name: { "en-GB": $("title").text() }
-                }
-            }
-        };
-        
-    };
-    this.loadTinCanConfig();
-    
-    
     /*this.loadExercise(); //include asking for extra tinCan config
     this.setGrade();
     this.testButton();
     this.nextExercise();
     */
     
+            
+    var onTestSuccess = function (ev) {
+        console.log("ev =", ev);
+        // TODO : send a completed for the exercise with score
+        var sGrade = this.oStudent.getNameForGrade(ev.iLevel);
+        console.log("sGrade =", sGrade);
+        var sResponse = JSON.stringify({"attempts":ev.aAttempts, "code":ev.sCode});
+        var oResult = {
+                    "completion": true,
+                    "success": true,
+                    "response":sResponse,
+                    "score": {
+                        "scaled": ev.iLevel,
+                        "raw": ev.aAttempts[ev.iLevel]
+                    }
+                };
+        
+        this.oTinCan.sendCompletedStatement(oResult);
+        
+        // TODO : send a blooms statement for each object 
+        
+        var oStatement = this.oTinCan.getTinCanStatement(
+            this.oExercise.oLevel.info.verb, 
+            this.oExercise.info.objects[0],  // TODO : make it do all of them 
+            oResult);
+        this.oTinCan.sendStatement(oStatement);
+        
+        console.log("this.oExercise =", this.oExercise);
+        // TODO : (eventually we may need to move the objects down to the levels so other providers can have their own verbs)
+        
+        
+        // TODO : Success message (modal??) and continue button
+        $("#exercise_end").modal({
+            escapeClose: false,
+            clickClose: false,
+            showClose: false
+        });
+    
+        
+        // TODO : work out the next exercise
+        // TODO : load the next one
+        // TODO : use a deffered 
+            
+    };
+    
+    var onTestFail = function (ev) {
+        console.log("ev =", ev);
+        
+        //console.log("Fail this.aLRSConf =", this.aLRSConf);
+        var sResponse = JSON.stringify({"fails":ev.aTinOut, "code":ev.sCode});
+        console.log("sResponse =", sResponse);
+        var oResult = {
+                    "completion": false,
+                    "success": false,
+                    "response":sResponse
+        };
+        
+        this.oTinCan.sendAttemptedStatement(oResult);
+        // TODO : anayze errors and show hints
+        // TODO : if struggling (say 5 attempts at this level  suggest the make easier)
+
+    };
+    
+	$(document).on("exerciseTestSuccess", onTestSuccess.bind(this));
+    $(document).on("exerciseTestFail", onTestFail.bind(this));
     
     
 };
@@ -168,7 +255,7 @@ var ActiveJavascript = function (){
                 
                 var sExtra = "";
                 var next = currentExercise + 1;
-                
+                                         
                 if(next < aExercises.length) {
                     //sExtra = "<a href='#"+aExercises[next].folder+"'>Next</a>";
                     var newHash = "#"+aExercises[next].folder;
