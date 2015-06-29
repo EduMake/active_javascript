@@ -4,7 +4,7 @@ function findHomophones(aWords){
     var aHomophoneList = [];
     for(var i = 0; i < aWords.length; i++) {
         var sWord = aWords[i];
-        if(isHomophone(sWord))
+        if(isHomophone(sWord)) //if(aHomophones.indexOf(sWord) >= 0)
         {
             aHomophoneList.push(sWord);       
         }
@@ -23,7 +23,7 @@ function findHomophones2(aWords){
 
 function highlight() {
     var sText = $("#text").html().trim([" ", "\n"]);    
-    var aWords = sText.split(/\W/);
+    var aWords = sText.toLowerCase().split(/\W/);
     
     var aFoundWords =  findHomophones(aWords);
     console.log(aFoundWords);
