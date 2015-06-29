@@ -10,6 +10,7 @@ var Exercise = function (aData, sExercise){
     // TODO : library loading
     // TODO : info cascading (probably with a flag)
     
+    
     this.loadLevel = function() {
         if(!this.aData.hasOwnProperty(this.iLevel)) {
             console.log("No Level "+this.iLevel + " Found");
@@ -160,5 +161,21 @@ var Exercise = function (aData, sExercise){
                     });
             }    
         } 
+    };
+    
+    this.getTinCanObject =function() {
+        console.log("id this.oExercise.aData.info =", this.oExercise.aData.info);
+        return {
+            "id":this.oExercise.aData.info.objects[0],
+            "objectType": "Activity",
+                "definition": {
+                "name": {
+                    "en-US": "Example Activity"
+                },
+                "description": {
+                    "en-US": "Example activity definition"
+                }
+            }
+        };
     };
 };

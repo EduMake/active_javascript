@@ -80,6 +80,22 @@ var ActiveJavascript = function (){
         this.aRunningOrder = aRunningOrder;
     };
     
+    this.getNext = function() {
+        var iCurrent = this.aRunningOrder.findIndex(function(element, index, array){
+            return element.sExercise === this.sExercise;
+        }, this);
+        
+        console.log("iCurrent =", iCurrent);
+        
+        var iNext = iCurrent + 1; 
+        var sNext = false;
+        if(iNext < this.aRunningOrder.length) {
+            sNext =  this.aRunningOrder[iNext];
+        }
+        return sNext;
+    };
+    
+    
     this.whenLoaded = function() {
         this.createRunningOrder();
         
@@ -154,11 +170,11 @@ var ActiveJavascript = function (){
         var sGrade = this.oStudent.getNameForGrade(ev.iLevel);
         var sResponse = JSON.stringify({"attempts":ev.aAttempts, "code":ev.sCode});
         var oResult = {
-                    "completion": true,
+                    //"completion": true,
                     "success": true,
                     "response":sResponse,
                     "score": {
-                        "scaled": ev.iLevel,
+                        "scaled": ev.iLevel / 100,
                         "raw": ev.aAttempts[ev.iLevel]
                     }
                 };
@@ -166,21 +182,59 @@ var ActiveJavascript = function (){
         this.oTinCan.sendCompletedStatement(oResult);
         
         // TODO : send a blooms statement for each object 
+        /*
+        "id": "http://www.example.com/tincan/activities/LjFfFxuq",
+        "objectType": "Activity",
+        "definition": {
+            "name": {
+                "en-US": "Example Activity"
+            },
+            "description": {
+                "en-US": "Example activity definition"
+            }
+        }
+        */
         
         var oStatement = this.oTinCan.getTinCanStatement(
+            
             this.oExercise.oLevel.info.verb, 
-            this.oExercise.info.objects[0],  // TODO : make it do all of them 
+            {
+                "id":this.oExercise.aData.info.objects[0],
+                "objectType": "Activity",
+                "definition": {
+                "name": {
+                    "en-US": "Example Activity"
+                },
+                "description": {
+                    "en-US": "Example activity definition"
+                }
+            }
+        
+                
+            },  // TODO : make it do all of them 
             oResult);
         this.oTinCan.sendStatement(oStatement);
+        
+        var oNext = this.getNext();
+        console.log("oNext =", oNext);
+        
+        $("#next_exercise_name").html(oNext.sTitle);
         
         // TODO : (eventually we may need to move the objects down to the levels so other providers can have their own verbs)
         // TODO : Success message (modal??) and continue button
         $("#exercise_end").modal({
-            escapeClose: false,
-            clickClose: false,
-            showClose: false
+            closeText: "Next Exercise"
         });
-    
+        
+        $('#exercise_end').on($.modal.CLOSE, function(event, modal) {
+            window.location = this.sSite + "#" + oNext.sExercise;
+            /*this.sExercise = oNext.sExercise;
+            var thisEx = this.aExercises[this.sExercise];
+            this.oExercise = new Exercise(thisEx, this.sExercise);
+            */
+        }.bind(this));
+        
+        
         
         // TODO : work out the next exercise
         // TODO : load the next one
@@ -239,7 +293,7 @@ var ActiveJavascript = function (){
                 };
                 
                 endStatement.result = {
-                    "completion": true,
+                    //"completion": true,
                     "success": true,
                     "score": {
                         "scaled": 1
@@ -276,7 +330,7 @@ var ActiveJavascript = function (){
                 };
                 
                 endStatement.result = {
-                    "completion": false,
+                    //"completion": false,
                     "success": false,
                     "score": {
                         "scaled": 0

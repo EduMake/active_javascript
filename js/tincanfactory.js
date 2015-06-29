@@ -3,11 +3,9 @@ var TinCanFactory = function (aLRSs){
     this.aLRSs = [];
     this.oStudent = false; 
     
-    
     this.addLRS = function (oLRS) {
         oLRS.active = true;
         this.aLRSs.push(oLRS);
-        
     };
     
     this.getRecordStores = function() {
@@ -27,8 +25,15 @@ var TinCanFactory = function (aLRSs){
     
     this.setStudent = function (oStudent) {
         this.oStudent = oStudent;   
+        console.log("this.oStudent =", this.oStudent);
         // Add student LRSs
         this.oTinCan = new TinCan ({
+            DEBUG : true,
+            actor: {
+                mbox: "mailto:"+this.oStudent.sEmail,
+                objectType:"Actor",
+                name: this.oStudent.sEmail
+            },
             recordStores: this.getRecordStores()
         });
     };
@@ -58,7 +63,6 @@ var TinCanFactory = function (aLRSs){
                 name: { "en-GB": $("title").text() }
             }
         };
-        
         return this.getTinCanStatement(oVerb, oObject, oResult);
     };
     
@@ -75,27 +79,23 @@ var TinCanFactory = function (aLRSs){
                 name: { "en-GB": $("title").text() }
             }
         };
-        
-        
         return this.getTinCanStatement(oVerb, oObject, oResult);
     };
     
-    
     this.getTinCanStatement = function(oVerb, oObject, oResult) {
         var oStatement = {
-            actor: {
-                mbox: "mailto:"+this.oStudent.sEmail
-            },
             verb: oVerb,
             target: oObject,
             result:oResult
             //context:oContext
         }; 
-        
+        console.log("oStatement =", oStatement);
         return oStatement;
     };
     
-    this._sendStatement = function(oStatement){
+    this._sendStatement = function(oState){
+        var oStatement = this.oTinCan.prepareStatement(oState);
+        console.log(JSON.stringify(oStatement));
         this.oTinCan.sendStatement(oStatement);
     };
     
