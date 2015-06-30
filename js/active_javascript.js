@@ -163,15 +163,15 @@ var ActiveJavascript = function (){
                     }
                 };
         
-        this.oTinCan.sendCompletedStatement(oResult);
+        //this.oTinCan.sendCompletedStatement(oResult);
         
         // TODO : send a blooms statement for each object 
         
         var oStatement = this.oTinCan.getTinCanStatement(
             this.oExercise.oLevel.info.verb, 
-            this.oExercise.info.objects[0],  // TODO : make it do all of them 
+            "junk",//this.oExercise.info.objects[0],  // TODO : make it do all of them 
             oResult);
-        this.oTinCan.sendStatement(oStatement);
+        //this.oTinCan.sendStatement(oStatement);
         
         // TODO : (eventually we may need to move the objects down to the levels so other providers can have their own verbs)
         // TODO : Success message (modal??) and continue button
@@ -196,13 +196,13 @@ var ActiveJavascript = function (){
                     "response":sResponse
         };
         
-        this.oTinCan.sendAttemptedStatement(oResult);
+        //this.oTinCan.sendAttemptedStatement(oResult);
         // TODO : anayze errors and show hints
         // TODO : if struggling (say 5 attempts at this level  suggest the make easier)
 
     };
     
-	$(document).on("exerciseTestSuccess", onTestSuccess.bind(this));
+	  $(document).on("exerciseTestSuccess", onTestSuccess.bind(this));
     $(document).on("exerciseTestFail", onTestFail.bind(this));
     
     
