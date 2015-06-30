@@ -21,11 +21,11 @@ var Decrypt = function(Alphabet, SubstitutionAlphabet, EncypheredText) {
     //The variable i will go up from 0 (pointing to the first letter)
     //until i = the length of our encyphered text (pointing to the last letter in our encyphered text)
     for(var i = 0 ; i < EncypheredText.length; i++) { 
-        var EncypheredTextLetter = EncypheredText[j]; //The letter we want to Encypher this time
+        var EncypheredTextLetter = EncypheredText[i; //The letter we want to Encypher this time
         var Position = SubstitutionAlphabet.search(EncypheredTextLetter); //Finds what position our Letter is in our SubstitutionAlphabet
-        var PlainTextLetter = SubstitutionAlphabet[Position]; //Look up that position in our Plain text Alphabet
+        var PlainTextLetter = Alphabet[Position]; //Look up that position in our Plain text Alphabet
         OutputText += PlainTextLetter; //Add our Plain Text Letter to the OutputText
     }
     return OutputText; //Send it back
-};
+
 

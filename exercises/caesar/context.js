@@ -41,7 +41,7 @@ $("#matchesfound").hide();
         var sCypher = $("#cypheralphabet").text();
         var sPlainText = Decrypt(sAlphabet, sCypher, sIn);
         $("#plaintext").val(sPlainText);
-        testPlainText();
+        //testPlainText();
     };
     
     var testPlainText = function () {
@@ -72,7 +72,7 @@ $("#matchesfound").hide();
     
     $(".getEncrypted").click(getEncrypted);
     $(".decrypt").click(getDecrypted);
-    
+    /*
     var iSearchTimer = 0;
     function search(){
         if(testPlainText()) {
@@ -94,5 +94,9 @@ $("#matchesfound").hide();
     
     
     $("#testwords").on("input", testPlainText);
-    
+    */
     makeCaesarCypher();
+    
+//TESTS//
+    
+    
