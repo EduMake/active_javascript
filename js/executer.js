@@ -57,7 +57,9 @@ var Executer = function (sTestScript, sContextScript){
             script += "var assert = function(outcome, description, type ) {aTests.push({text:description,type:type,label:outcome?'Pass':'Fail',pass:outcome, row: false, col: false});};";
         }
         script +=  this.sContextScript.replace("//CODE//", this.sCode);
+        
         if(this.bTest) {
+            // TODO : if()//TESTS// not in script add it at end
             script = script.replace("//TESTS//", this.sTestScript);
         }
         script += "\n\nreturn aTests;";
