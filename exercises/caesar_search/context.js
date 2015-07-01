@@ -8,7 +8,6 @@ $("#matchesfound").hide();
     
     var makeCaesarCypher = function() {
         var iCaesarSetting = $("#caesar_setting").val();
-        console.log("iCaesarSetting =", iCaesarSetting);
         $("#cypheralphabet").text(MakeCaesarCypherAlphabet(iCaesarSetting));
         autoAction();
     };

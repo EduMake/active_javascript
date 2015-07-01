@@ -46,11 +46,8 @@ $("#matchesfound").hide();
     
     var testPlainText = function () {
         var aWords = $("#testwords").val().split(" ");
-        console.log("aWords =", aWords);
         var oReg = new RegExp(aWords.join("|"));
-        console.log("oReg =", oReg);
         var sPlainText = $("#plaintext").val();
-        console.log("sPlainText =", sPlainText);
         
         if(oReg.test(sPlainText)) {
            $("#matchesfound").show();
