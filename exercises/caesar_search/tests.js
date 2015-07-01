@@ -7,3 +7,6 @@ assert( MakeCaesarCypherAlphabet(15) == "PQRSTUVWXYZ_ABCDEFGHIJKLMNO",
 
 assert( FindNextPossibleSetting(0, "PHHPRZOPHOSPKB") == 15,  'Should find possible Setting of 15 with Cypher Text of "PHHPRZOPHOSPKB"', "logic");
 
+assert( FindNextPossibleSetting(0, "VDTZHTBVQRDUQTRFJKHVQVDVCOQYEHIVI") == 17,  
+  'Should find Setting to Decrypt "VDTZHTBVQRDUQTRFJKHVQVDVCOQYEHIVI"', "logic");
+

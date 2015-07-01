@@ -1,31 +1,37 @@
-var Encrypt = function(Alphabet, SubstitutionAlphabet, PlainText) {
-    var OutputText = ""; //We start with no letters in our output
-    
-    //The variable i will go up from 0 (pointing to the first letter)
-    //until i = the length of our plain text (pointing to the last letter in our plain text)
-    for(var i = 0 ; i < PlainText.length; i++) { 
-        var PlainTextLetter = PlainText[i]; //The letter we want to Encypher this time
-        var Position = Alphabet.search(PlainTextLetter); //Finds what position our Letter is in our Alphabet
-        if(Position === -1) { //If we didn't find the letter in our Alphabet
-            Position = Alphabet.search("_"); //Find "_" instead
+/*global PlainTextAlphabet Decrypt */ //The PlainTextAlphabet and Decrypt functions are already written 
+
+//Checks whether the PlainText we have produced contains common words 
+//Returns true if found false if not
+function PlainTextContainsWords(PlainText) {
+    var Words = ["THE", "at", "CANON"]; //Common word list (add more)
+    //  https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular_Expressions
+    var Pattern = Words.join("|"); // "THE|at|CANON"
+    var PatternMatcher = new RegExp(Pattern); //Makes a Pattern Matcher using the Pattern 
+    var MatchFound = PatternMatcher.test(PlainText); //true if the plain text contains a match
+    return MatchFound;
+}
+
+//Returns the CypherAlphabet (the outer ring) for the given Setting
+var MakeCaesarCypherAlphabet = function(Setting) {
+    Setting = Setting % PlainTextAlphabet.length; // Make it so Setting can't ever point outside our Alphabet by using % (remainders)
+    var Start =  PlainTextAlphabet.slice(0, Setting); //Get first Setting Letters of Our Alphabet
+    var End =  PlainTextAlphabet.slice(Setting); // Get the rest of the end of Alphabet
+    var CypherAlphabet = End + End; //New Alphabet is the End then the Start
+    return CypherAlphabet;
+};
+
+//Trys to find a Setting which Decrypts the CypherText into PlainText which passes PlainTextContainsWordsing
+//Returns the Setting number if successful and false if it couldn't find anything
+function FindNextPossibleSetting(StartSetting, CypherText) {
+    var Setting = StartSetting; //Set the first Setting to check to StartSetting (so the continue button works and we can check out different possiblities)
+    while(Setting <= PlainTextAlphabet.length) { //Go until run out of possible Settings
+        var SettingAlphabet = MakeCaesarCypherAlphabet(Setting); //Get the CypherAlphabet for our current attempted setting
+        var PlainText = Decrypt(PlainTextAlphabet, SettingAlphabet, CypherText); //Try Decrypting the CypherText
+        var SomeWordsMatch =  PlainTextContainsWords(PlainText); //Does the PlainText have reconginable words in it
+        if(SomeWordsMatch) {
+            return Setting; //Found a match, send the Setting back to process
         }
-        var CypherLetter = SubstitutionAlphabet[Position]; //Look up that position in our Substitution Alphabet
-        OutputText += CypherLetter; //Add our Cypher Letter to the OutputText
+        Setting ++; // Not found so increase the setting by 1
     }
-    return OutputText; //Send it back
-};
-
-var Decrypt = function(Alphabet, SubstitutionAlphabet, CypherText) {
-    var OutputText = ""; //We start with no letters in our output
-    
-    //The variable i will go up from 0 (pointing to the first letter)
-    //until i = the length of our Cypher text (pointing to the last letter in our Cypher text)
-    for(var i = 0 ; i < CypherText.length; i++) { 
-        var CypherTextLetter = CypherText[j]; //The letter we want to Encypher this time
-        var Position = SubstitutionAlphabet.search(CypherTextLetter); //Finds what position our Letter is in our SubstitutionAlphabet
-        var PlainTextLetter = SubstitutionAlphabet[Position]; //Look up that position in our Plain text Alphabet
-        OutputText += PlainTextLetter; //Add our Plain Text Letter to the OutputText
-    }
-    return OutputText; //Send it back
-};
-
+    return "None Found"; //If we got all the way to the end of the possible Setting send back false;
+}
