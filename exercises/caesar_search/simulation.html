@@ -1,0 +1,34 @@
+<style type='text/css'>
+  pre{
+      font-size:2em;
+      margin:0px;
+      padding:0px;
+  }
+</style>
+
+<h2>Current Cypher Table</h2>
+<table>
+    <tr><th>Plain Text Alphabet</th><td><pre  id="alphabet">ABCDEFGHIJKLMNOPQRSTUVWXYZ_</pre></td></tr>
+    <tr><th>Cypher Alphabet</th><td ><pre id="cypheralphabet" contenteditable="true">ABCDEFGHIJKLMNOPQRSTUVWXYZ_</pre></td></tr>
+</table>
+
+<label>Caesar Cypher Setting</label>
+<input type="number" id="caesar_setting" value="1" />
+
+<h2>Messages</h2>
+<table>
+    <tr>
+        <th>Plain Text Message</th>
+        <td><input size="40" id="plaintext" value="ENCRYPTION_TEST"/></td>
+        <td><button class="getEncrypted">Encrypt</button></td>
+    </tr>
+    <tr>
+        <th>Cypher Text Message</th>
+        <td><input size="40" id="cyphertext" value="" title="Put Cypher text here and it will be decoded above"/></td>
+        <td><button class="decrypt">Decrypt</button></td>
+    </tr>
+</table>
+
+<button id="search">Start search for Setting</button> <button id="continue_search">Continue</button>
+
+<h3 id="searchresult"></h3>
