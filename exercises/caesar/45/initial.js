@@ -9,13 +9,13 @@ var Encrypt = function(Alphabet, SubstitutionAlphabet, PlainText) {
         if(Position === -1) { //If we didn't find the letter in our Alphabet
             Position = Alphabet.search("_"); //Find "_" instead
         }
-        var EncypheredLetter = SubstitutionAlphabet[Position]; //Look up that position in our Substitution Alphabet
-        OutputText += EncypheredLetter; //Add our Encyphered Letter to the OutputText
+        var CypherLetter = SubstitutionAlphabet[Position]; //Look up that position in our Substitution Alphabet
+        OutputText += CypherLetter; //Add our Cypher Letter to the OutputText
     }
     return OutputText; //Send it back
 };
 
-var Decrypt = function(Alphabet, SubstitutionAlphabet, EncypheredText) {
+var Decrypt = function(Alphabet, SubstitutionAlphabet, CypherText) {
     var OutputText = ""; //We start with no letters in our output
     
     
