@@ -86,10 +86,14 @@ var ActiveJavascript = function (){
         this.parseURL();
         if(this.aExercises.hasOwnProperty(this.sPageHash)) {
             this.sExercise = this.sPageHash;
+            this.iRunningOrderPosition = this.aRunningOrder.findIndex(function(oItem){
+                return oItem.sExercise === this.sPageHash ;
+            }, this);
         } else {
-            this.sExercise = this.aRunningOrder[0].sExercise;
+            this.iRunningOrderPosition = 0;
+            this.sExercise = this.aRunningOrder[this.iRunningOrderPosition].sExercise;
         }
-        
+            
         var thisEx = this.aExercises[this.sExercise];
         
         this.oExercise = new Exercise(thisEx, this.sExercise);
@@ -150,6 +154,36 @@ var ActiveJavascript = function (){
     
             
     var onTestSuccess = function (ev) {
+        /*
+        console.log("this.aRunningOrder =", this.aRunningOrder);
+        console.log("this.aExercises =", this.aExercises);
+        console.log("this.oExercise =", this.oExercise);
+        console.log("this.sExercise =", this.sExercise);
+        */
+        
+        
+        var sExtra = "";
+        
+        var next = this.iRunningOrderPosition + 1;
+          
+        if(next < this.aRunningOrder.length) {
+            //sExtra = "<a href='#"+aExercises[next].folder+"'>Next</a>";
+            var newHash = "#"+this.aRunningOrder[next].sExercise;
+            $("#next").attr("href", newHash).show();
+            
+        } else if (next === aExercises.length) {
+            sExtra = "<h2>You have finished</h2>"
+        }
+        
+        $("#result").html("Well done. Your code passed all the tests.<br>"+sExtra);
+                
+    };
+    
+    var onTestFail = function (ev) {
+        $("#result").html("Please Try Again : Check the test results to work out what to do.");
+    };
+            
+    /*var onTestSuccess = function (ev) {
         // TODO : send a completed for the exercise with score
         var sGrade = this.oStudent.getNameForGrade(ev.iLevel);
         var sResponse = JSON.stringify({"attempts":ev.aAttempts, "code":ev.sCode});
@@ -200,7 +234,7 @@ var ActiveJavascript = function (){
         // TODO : anayze errors and show hints
         // TODO : if struggling (say 5 attempts at this level  suggest the make easier)
 
-    };
+    };*/
     
 	  $(document).on("exerciseTestSuccess", onTestSuccess.bind(this));
     $(document).on("exerciseTestFail", onTestFail.bind(this));
