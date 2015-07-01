@@ -83,6 +83,10 @@ var Executer = function (sTestScript, sContextScript){
         try {
             var aTests = funcCode();
             this.aTests = this.aTests.concat(aTests);
+            if(this.bTest && this.aTests.length === 0 ) {
+                var err = {keep:true, type:"error",text:"No Tests Ran Successfully.", label:"Error", pass:false, row:false };
+                this.aTests.push(err);
+            }
         
         } catch (e){
             if (e instanceof TypeError) {
