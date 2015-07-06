@@ -16,14 +16,13 @@ $( document ).ready(function() {
             name:"Loyalty Card",
             folder:"loyalty_card",
             tags:[]
-        },
-        
+        }
     ];
     
     //findExercise by name    
-    var findExercise = function(sExerciseHash) {
+    var findExercise = function(sExerciseSearch) {
         var iExercise = aExercises.findIndex(function(element, index, array) {
-            return sExerciseHash === element.folder;
+            return sExerciseSearch === element.folder;
         });
         
         if(iExercise === -1) {

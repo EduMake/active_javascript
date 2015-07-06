@@ -31,9 +31,9 @@ $( document ).ready(function() {
     ];
     
     //findExercise by name    
-    var findExercise = function(sExerciseHash) {
+    var findExercise = function(sExerciseSearch) {
         var iExercise = aExercises.findIndex(function(element, index, array) {
-            return sExerciseHash === element.folder;
+            return sExerciseSearch === element.folder;
         });
         
         if(iExercise === -1) {
@@ -93,8 +93,8 @@ $( document ).ready(function() {
                 
                 if(next < aExercises.length) {
                     //sExtra = "<a href='#"+aExercises[next].folder+"'>Next</a>";
-                    var newHash = "#"+aExercises[next].folder;
-                    $("#next").attr("href", newHash);
+                    var newSearch = "?"+aExercises[next].folder;
+                    $("#next").attr("href", newSearch);
                     $("#next").off("click").click(function(){
                          setExercise(next, true);
                     }).show();
@@ -169,20 +169,20 @@ $( document ).ready(function() {
         $("#run").off("click").click(function(){runCode(currExercise, false);});
         $("#runtest").off("click").click(function(){runCode(currExercise, true);});
         
-        oExecuter = new Executer; 
+        oExecuter = new Executer(); 
         oExecuter.setCode(editor.getValue());
         runCode(currExercise, false);
     };
     
     $("#reset").click(function(){
-        var sExerciseHash = window.location.hash.replace("#","");
-        var iExercise = findExercise(sExerciseHash);
+        var sExerciseSearch = window.location.search.replace("?","");
+        var iExercise = findExercise(sExerciseSearch);
         setExercise(iExercise, false);
     });
     
     $("#reload").click(function(){
-        var sExerciseHash = window.location.hash.replace("#","");
-        var iExercise = findExercise(sExerciseHash);
+        var sExerciseSearch = window.location.search.replace("?","");
+        var iExercise = findExercise(sExerciseSearch);
         setExercise(iExercise, true);
     });
     
@@ -190,7 +190,7 @@ $( document ).ready(function() {
     aExercises.forEach(function logArrayElements(element, index, array) {
         var li = document.createElement('li');
         var a = document.createElement('a');
-        a.href = "#"+element.folder;
+        a.href = "?"+element.folder;
         a.appendChild( document.createTextNode( element.name ) ); 
         
         li.appendChild( a ); 
@@ -200,14 +200,14 @@ $( document ).ready(function() {
 
     var listitems = $("#exercise_list li a");
     listitems.off("click").click(function(){
-        var parts = this.href.split("#");
+        var parts = this.href.split("?");
         var iNew = findExercise(parts[1]);
         setExercise(iNew);
     });
     
-    var sExerciseHash = window.location.hash.replace("#","");
+    var sExerciseSearch = window.location.search.replace("?","");
     
-    var iExercise = findExercise(sExerciseHash);
+    var iExercise = findExercise(sExerciseSearch);
     setExercise(iExercise);
     
     var field = document.getElementById("tincanemail");

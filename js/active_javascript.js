@@ -8,7 +8,6 @@ editor.setFontSize(16);
 // Boo Hiss Globals.
 var intervalID = 0;
 
-
 var ActiveJavascript = function (){
     this.sDefaultExercise = "central_heating";
     this.sExercise = false;
@@ -36,8 +35,8 @@ var ActiveJavascript = function (){
     
     
     this.parseURL = function() {
-         this.sPageHash = window.location.hash.replace("#","");
-         this.sSite = window.location.href.replace(window.location.search, "").replace(window.location.hash, "");
+         this.sPageSearch = window.location.search.replace("?","");
+         this.sSite = window.location.href.replace(window.location.search, "").replace(window.location.search, "");
     };
     
     this.createRunningOrder = function() {
@@ -84,10 +83,10 @@ var ActiveJavascript = function (){
         this.createRunningOrder();
         
         this.parseURL();
-        if(this.aExercises.hasOwnProperty(this.sPageHash)) {
-            this.sExercise = this.sPageHash;
+        if(this.aExercises.hasOwnProperty(this.sPageSearch)) {
+            this.sExercise = this.sPageSearch;
             this.iRunningOrderPosition = this.aRunningOrder.findIndex(function(oItem){
-                return oItem.sExercise === this.sPageHash ;
+                return oItem.sExercise === this.sPageSearch ;
             }, this);
         } else {
             this.iRunningOrderPosition = 0;
@@ -154,25 +153,16 @@ var ActiveJavascript = function (){
     
             
     var onTestSuccess = function (ev) {
-        /*
-        console.log("this.aRunningOrder =", this.aRunningOrder);
-        console.log("this.aExercises =", this.aExercises);
-        console.log("this.oExercise =", this.oExercise);
-        console.log("this.sExercise =", this.sExercise);
-        */
-        
-        
         var sExtra = "";
         
         var next = this.iRunningOrderPosition + 1;
           
         if(next < this.aRunningOrder.length) {
             //sExtra = "<a href='#"+aExercises[next].folder+"'>Next</a>";
-            var newHash = "#"+this.aRunningOrder[next].sExercise;
-            $("#next").attr("href", newHash).show();
-            
+            var newSearch = "?"+this.aRunningOrder[next].sExercise;
+            $("#next").attr("href", newSearch).show();
         } else if (next === aExercises.length) {
-            sExtra = "<h2>You have finished</h2>"
+            sExtra = "<h2>You have finished</h2>";
         }
         
         $("#result").html("Well done. Your code passed all the tests.<br>"+sExtra);
@@ -287,8 +277,8 @@ var ActiveJavascript = function (){
                                          
                 if(next < aExercises.length) {
                     //sExtra = "<a href='#"+aExercises[next].folder+"'>Next</a>";
-                    var newHash = "#"+aExercises[next].folder;
-                    $("#next").attr("href", newHash);
+                    var newSearch = "?"+aExercises[next].folder;
+                    $("#next").attr("href", newSearch);
                     $("#next").off("click").click(function(){
                          setExercise(next, true);
                     }).show();
@@ -335,7 +325,7 @@ var ActiveJavascript = function (){
     aExercises.forEach(function logArrayElements(element, index, array) {
         var li = document.createElement('li');
         var a = document.createElement('a');
-        a.href = "#"+element.folder;
+        a.href = "?"+element.folder;
         a.appendChild( document.createTextNode( element.name ) ); 
         
         li.appendChild( a ); 
@@ -345,7 +335,7 @@ var ActiveJavascript = function (){
 
     var listitems = $("#exercise_list li a");
     listitems.off("click").click(function(){
-        var parts = this.href.split("#");
+        var parts = this.href.split("?");
         var iNew = findExercise(parts[1]);
         setExercise(iNew);
     });
