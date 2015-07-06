@@ -14,7 +14,8 @@
 <h2>Make new Caesar Cypher</h2>
 <label>Caesar Cypher Setting</label>
 <input type="number" id="caesar_setting" value="1" /><br />
-<label>When we change the cypher automatically </label><select id="mode">
+<label>When we change the cypher automatically </label>
+<select id="mode">
     <option>Encrypt</option>
     <option>Decrypt</option>
     <option>Do Nothing</option>
@@ -25,11 +26,11 @@
     <tr>
         <th>Plain Text Message</th>
         <td><input size="40" id="plaintext" value="ENCRYPTION_TEST" title="Put normal text here and it will be encoded below"/></td>
-        <td><button class="getEncrypted">Encrypt</button></td>
+        <td><button class="encrypt">Encrypt</button></td>
     </tr>
     <tr>
         <th>Cypher Text</th>
-        <td><input size="40" id="encypheredtext" value="" title="Put Encyphered text here and it will be decoded above"/></td>
+        <td><input size="40" id="cyphertext" value="" title="Put cypher text here and it will be decoded above"/></td>
         <td><button class="decrypt">Decrypt</button></td>
     </tr>
 </table>
