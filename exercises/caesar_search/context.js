@@ -1,16 +1,19 @@
 $("#matchesfound").hide();
     
-    var autoAction = function() {
-        //getDecrypted();
-    };
-    
-    var PlainTextAlphabet = $("#alphabet").text();
-    
-    var makeCaesarCypher = function() {
-        var iCaesarSetting = $("#caesar_setting").val();
-        $("#cypheralphabet").text(MakeCaesarCypherAlphabet(iCaesarSetting));
-        autoAction();
-    };
+var autoAction = function() {
+    getDecrypted();
+};
+
+var PlainTextAlphabet = $("#alphabet").text();
+
+var makeCaesarCypher = function() {
+    var iCaesarSetting = $("#caesar_setting").val();
+    //console.log("iCaesarSetting =", iCaesarSetting);
+    var sCypherAlphabet = MakeCaesarCypherAlphabet(iCaesarSetting);
+    //console.log("sCypherAlphabet =", sCypherAlphabet);
+    $("#cypheralphabet").text(sCypherAlphabet);
+    autoAction();
+};
     
 var Encrypt = function(Alphabet, SubstitutionAlphabet, PlainText) {
     var OutputText = ""; //We start with no letters in our output
@@ -44,79 +47,81 @@ var Decrypt = function(Alphabet, SubstitutionAlphabet, CypherText) {
 };
 
     
-    var getEncrypted = function() {
-        var sIn = $("#plaintext").val();
-        var sAlphabet = $("#alphabet").text(); 
-        var sCypher = $("#cypheralphabet").text();
-        var sCypherText = "";
-        if(sAlphabet.length !== sCypher.length)
-        {
-            sCypherText = "Cypher Too Short";
-        } else {
-            sCypherText = Encrypt(sAlphabet, sCypher, sIn);
-        }
-        $("#cyphertext").val(sCypherText);    
-    };
+var getEncrypted = function() {
+    var sIn = $("#plaintext").val();
+    var sAlphabet = $("#alphabet").text(); 
+    var sCypher = $("#cypheralphabet").text();
+    var sCypherText = "";
+    if(sAlphabet.length !== sCypher.length)
+    {
+        sCypherText = "Cypher Too Short";
+    } else {
+        sCypherText = Encrypt(sAlphabet, sCypher, sIn);
+    }
+    $("#cyphertext").val(sCypherText);    
+    //console.log("getEncrypted sCypherText =", sCypherText);
+};
 
-    var getDecrypted = function() {
-        var sAlphabet = $("#alphabet").text(); 
-        var sIn = $("#cyphertext").val();
-        var sCypher = $("#cypheralphabet").text();
-        var sPlainText = Decrypt(sAlphabet, sCypher, sIn);
-        $("#plaintext").val(sPlainText);
-        //testPlainText();
-    };
-    
-    
-    
-    var testPlainText = function () {
-        var sPlainText = $("#plaintext").val();
-        
-        if(PlainTextContainsWords(sPlainText)) {
-           $("#matchesfound").show();
-           return true;
-        } else {
-           $("#matchesfound").hide();
-           return false;
-        } 
-    };
-    
-    $("#caesar_setting").on("input", makeCaesarCypher);
-    
-    //$("#plaintext").on("input", getEncrypted);
-    $("#cyphertext").on("input", getDecrypted);
-    
-    $("#cypheralphabet").on("input", autoAction);
-    
-    $(".getEncrypted").click(getEncrypted);
-    $(".decrypt").click(getDecrypted);
+var getDecrypted = function() {
+    var sAlphabet = $("#alphabet").text(); 
+    var sIn = $("#cyphertext").val();
+    var sCypher = $("#cypheralphabet").text();
+    var sPlainText = Decrypt(sAlphabet, sCypher, sIn);
+    //console.log("sPlainText =", sPlainText);
+    $("#plaintext").val(sPlainText);
+    //testPlainText();
+};
 
+
+
+var testPlainText = function () {
+    var sPlainText = $("#plaintext").val();
     
+    if(PlainTextContainsWords(sPlainText)) {
+       $("#matchesfound").show();
+       return true;
+    } else {
+       $("#matchesfound").hide();
+       return false;
+    } 
+};
+
+$("#caesar_setting").on("input", makeCaesarCypher);
+
+//$("#plaintext").on("input", getEncrypted);
+$("#cyphertext").on("input", getDecrypted);
+
+$("#cypheralphabet").on("input", autoAction);
+
+$(".encrypt").click(getEncrypted);
+$(".decrypt").click(getDecrypted);
+
+
 //CODE//    
 
-    
-    function search(){
-        var iSetting = FindNextPossibleSetting($("#caesar_setting").val(), $("#cyphertext").val());
-        if(iSetting  === false) {
-            $("#searchresult").text("Search found no matching words");
-        } else {
-          $("#caesar_setting").val(iSetting);
-          makeCaesarCypher();
-          $("#searchresult").text("Words found with Setting of "+iSetting );
-        }
+
+function search(){
+    var iSetting = FindNextPossibleSetting($("#caesar_setting").val(), $("#cyphertext").val());
+    if(iSetting  === false) {
+        $("#searchresult").text("Search found no matching words");
+    } else {
+      $("#caesar_setting").val(iSetting);
+      makeCaesarCypher();
+      $("#searchresult").text("Words found with Setting of "+iSetting );
     }
-    
-    function search_start(){
-        $("#caesar_setting").val(0);
-        makeCaesarCypher();
-        search();
-    }
-    
-    $("#search").click(search_start);
-    $("#continue_search").click(search);
-    
+}
+
+function search_start(){
+    $("#caesar_setting").val(0);
     makeCaesarCypher();
-    
+    search();
+}
+
+$("#search").click(search_start);
+$("#continue_search").click(search);
+
+makeCaesarCypher();
+
 //TESTS//
-    
+
     
