@@ -75,7 +75,7 @@ var Executer = function (sTestScript, sContextScript){
             //console.log("Not bRunnable this.bRunnable =", this.bRunnable, "this.bAnnotations =", this.bAnnotations, "this.sCode.length =", this.sCode.length,            "this.sTestScript.length =", this.sTestScript.length,"this.sContextScript.length =", this.sContextScript.length, "this.bFirstRun =", this.bFirstRun, "this.bReady =", this.bReady,"this.bRunnable =", this.bRunnable);
             return false;
         } else {
-            console.log("Running");
+            //console.log("Running");
         }
         
         var script = this.getExecutionCode();
@@ -116,7 +116,9 @@ var Executer = function (sTestScript, sContextScript){
                 var sText = oMess.text;
                 
                 if(oMess.row !== false) {
-                    $(li).click(function(){editor.gotoLine(oMess.row + 1);});
+                    $(li).click(function(){
+                      editor.gotoLine(oMess.row + 1);
+                    });
                     sText = "Line "+(oMess.row+1)+" : "+sText;
                 }
                 
