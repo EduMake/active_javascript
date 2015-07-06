@@ -12,7 +12,7 @@ var Exercise = function (aData, sExercise){
     
     this.loadLevel = function() {
         if(!this.aData.hasOwnProperty(this.iLevel)) {
-            console.log("No Level "+this.iLevel + " Found");
+            //console.log("No Level "+this.iLevel + " Found");
             var i = this.iLevel;
             var bSearching = true;
             while (i > 0 && bSearching) {
@@ -28,7 +28,7 @@ var Exercise = function (aData, sExercise){
             }
             if(this.aData.hasOwnProperty(""+i)) {
                 this.iLevel = i; 
-                console.log("Found Level "+i);
+                //console.log("Found Level "+i);
             } else {
                 return false;
             }
@@ -98,7 +98,7 @@ var Exercise = function (aData, sExercise){
     this.makeEasier = function () {
         var iEasierLevel = this.iLevel - 5;
         if(!this.aData.hasOwnProperty(iEasierLevel)) {
-            console.log("no easier level "+this.iLevel);
+            console.log("No easier level "+this.iLevel);
             return false;
         }
         
@@ -106,7 +106,8 @@ var Exercise = function (aData, sExercise){
         this.setLevel(iEasierLevel);
         var sOldCodeStart = "\n/* NOTE : Your previous code is here, in case it is of use.\n";
         
-        var sEasierCode = (this.oLevel.initial + sOldCodeStart+sOldCode+"*/").replace("*/*/","*/");
+        var oReg = new RegExp("/\\*.+\\*/", "g");
+        var sEasierCode = (this.oLevel.initial + sOldCodeStart + sOldCode.replace(oReg, "")+"*/").replace("*/*/","*/");
         editor.setValue(sEasierCode); // or session.setValue
         editor.navigateFileStart();
         
