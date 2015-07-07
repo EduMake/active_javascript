@@ -162,4 +162,15 @@ var Exercise = function (aData, sExercise){
             }    
         } 
     };
+    
+    this.exportCode =function(){
+      
+        this.oExecuter.setCode(editor.getValue());
+        var code = this.oExecuter.getExecutionCode();
+        var html = '<html><head><title>Your Code</title></head><body>'+this.aData.simulation;
+        html += '<script src="http://code.jquery.com/jquery-2.1.4.min.js" ></script>';
+        html += '<script>$(document).ready(function(){'+code+'});</script></body></html>';
+        var sURL =  "data:text/html;base64," + btoa(html);
+        window.open(sURL,'_blank');
+    };
 };

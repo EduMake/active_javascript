@@ -110,6 +110,7 @@ var ActiveJavascript = function (){
         
         //$("#run").off("click").click(function(){this.oExercise.runCode(false);}.bind(this));
         $("#runtest").off("click").click(function(){this.oExercise.runCode(true);}.bind(this));
+        $("#export").off("click").click(function(){this.oExercise.exportCode(true);}.bind(this));
         $("#reload").off("click").click(function(){this.oExercise.reloadEditorContent();}.bind(this));
         $("#reset").off("click").click(function(){this.oExercise.loadEditorContent();}.bind(this));
         $("#easier").off("click").click(function(){
@@ -156,11 +157,13 @@ var ActiveJavascript = function (){
         var sExtra = "";
         
         var next = this.iRunningOrderPosition + 1;
-          
+        
+        // TODO : #21 teach specified paths
         if(next < this.aRunningOrder.length) {
             //sExtra = "<a href='#"+aExercises[next].folder+"'>Next</a>";
             var newSearch = "?"+this.aRunningOrder[next].sExercise;
             $("#next").attr("href", newSearch).show();
+            
         } else if (next === aExercises.length) {
             sExtra = "<h2>You have finished</h2>";
         }
