@@ -57,6 +57,7 @@ var ActiveJavascript = function (){
         }
         
         //console.log("aRunningOrder =", aRunningOrder);
+        /*
         aRunningOrder.sort(function(a, b){
             var iSort = a.sObject.localeCompare(b.sObject);
             if(iSort === 0) {
@@ -75,7 +76,7 @@ var ActiveJavascript = function (){
                 return 0;
             }
             return iSort;
-        });
+        });*/
         this.aRunningOrder = aRunningOrder;
     };
     
@@ -159,14 +160,15 @@ var ActiveJavascript = function (){
         var next = this.iRunningOrderPosition + 1;
         
         // TODO : #21 teach specified paths
-        if(next < this.aRunningOrder.length) {
+/*        if(next < this.aRunningOrder.length) {
             //sExtra = "<a href='#"+aExercises[next].folder+"'>Next</a>";
             var newSearch = "?"+this.aRunningOrder[next].sExercise;
             $("#next").attr("href", newSearch).show();
             
         } else if (next === aExercises.length) {
+        */
             sExtra = "<h2>You have finished</h2>";
-        }
+        //}
         
         $("#result").html("Well done. Your code passed all the tests.<br>"+sExtra);
                 
