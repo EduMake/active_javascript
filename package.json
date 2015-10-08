@@ -5,5 +5,30 @@
     "grunt": "~0.4.5",
     "grunt-dir2json": "~0.1.6",
     "grunt-contrib-watch": "~0.6.1"
+  },
+  "description": "Active Javascript",
+  "main": "index.html",
+  "dependencies": {
+    "grunt": "~0.4.5",
+    "grunt-contrib-watch": "~0.6.1",
+    "grunt-dir2json": "~0.1.6"
+  },
+  "scripts": {
+    "test": ""
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/EduMake/active_javascript.git"
+  },
+  "keywords": [
+    "Education",
+    "Test",
+    "Driven",
+    "Development"
+  ],
+  "author": "Martyn Eggleton",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/EduMake/active_javascript/issues"
   }
 }
