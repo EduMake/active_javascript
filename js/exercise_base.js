@@ -95,7 +95,7 @@ $( document ).ready(function() {
                     //sExtra = "<a href='#"+aExercises[next].folder+"'>Next</a>";
                     var newSearch = "?"+aExercises[next].folder;
                     $("#next").attr("href", newSearch);
-                    $("#next").off("click").click(function(){
+                    $("#next").on("click").click(function(){
                          setExercise(next, true);
                     }).show();
                     
@@ -133,7 +133,7 @@ $( document ).ready(function() {
         $("#testoutput").html("");
         $("#result").html("");
         $("#next").hide();
-        $("#start").off("click");
+        $("#start").on("click");
         
         var sStored = localStorage.getItem("code_"+currExercise.folder);
         //console.log("currExercise.folder =", currExercise.folder);
@@ -166,8 +166,8 @@ $( document ).ready(function() {
         }
         
         
-        $("#run").off("click").click(function(){runCode(currExercise, false);});
-        $("#runtest").off("click").click(function(){runCode(currExercise, true);});
+        $("#run").on("click").click(function(){runCode(currExercise, false);});
+        $("#runtest").on("click").click(function(){runCode(currExercise, true);});
         
         oExecuter = new Executer(); 
         oExecuter.setCode(editor.getValue());
@@ -199,7 +199,7 @@ $( document ).ready(function() {
     });
 
     var listitems = $("#exercise_list li a");
-    listitems.off("click").click(function(){
+    listitems.on("click").click(function(){
         var parts = this.href.split("?");
         var iNew = findExercise(parts[1]);
         setExercise(iNew);

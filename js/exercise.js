@@ -11,6 +11,7 @@ var Exercise = function (aData, sExercise){
     // TODO : info cascading (probably with a flag)
     
     this.loadLevel = function() {
+        console.log("loadLevel");
         if(!this.aData.hasOwnProperty(this.iLevel)) {
             //console.log("No Level "+this.iLevel + " Found");
             var i = this.iLevel;
@@ -35,7 +36,7 @@ var Exercise = function (aData, sExercise){
         }
         this.oLevel = this.aData[this.iLevel];
         this.resetGUI();
-        //$("#start").off("click");
+        //$("#start").on("click");
         this.oExecuter = new Executer(this.aData.tests, this.aData.context);
         //console.log("this.aData =", this.aData);
         
@@ -73,6 +74,7 @@ var Exercise = function (aData, sExercise){
     };
     
     this.setStudent = function (oStudent) {
+        //console.log("setStudent");
         this.oStudent = oStudent;
         this.setLevel(5 + parseInt(this.oStudent.sWorkingGrade, 10));
         //$("#taskleveltext").html(this.oStudent.getNameForGrade(this.iLevel));
@@ -91,11 +93,13 @@ var Exercise = function (aData, sExercise){
     };
     
     this.setLevel = function(iLevel) {
+        //console.log("SetLevel");
         this.iLevel = Math.floor(iLevel / 5) *5;
         this.loadLevel();    
     };
     
     this.makeEasier = function () {
+        //console.log("makeEasier");
         var iEasierLevel = this.iLevel - 5;
         if(!this.aData.hasOwnProperty(iEasierLevel)) {
             console.log("No easier level "+this.iLevel);
@@ -115,6 +119,7 @@ var Exercise = function (aData, sExercise){
     
     
     this.runCode = function(bTest){
+        //console.log("runCode");
         this.resetGUI();
         window.clearInterval(intervalID);
         
@@ -164,7 +169,7 @@ var Exercise = function (aData, sExercise){
     };
     
     this.exportCode =function(){
-      
+      //console.log("exportCode");
         this.oExecuter.setCode(editor.getValue());
         var code = this.oExecuter.getExecutionCode();
         var html = '<html><head><title>Your Code</title></head><body>'+this.aData.simulation;
