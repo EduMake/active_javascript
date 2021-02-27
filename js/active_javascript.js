@@ -108,17 +108,17 @@ var ActiveJavascript = function (){
             this.oExercise.oExecuter.setAnnotations(annot);
         }.bind(this));
         
-        //$("#run").off("click").click(function(){this.oExercise.runCode(false);}.bind(this));
-        $("#runtest").off("click").click(function(){this.oExercise.runCode(true);}.bind(this));
-        $("#export").off("click").click(function(){this.oExercise.exportCode(true);}.bind(this));
-        $("#reload").off("click").click(function(){this.oExercise.reloadEditorContent();}.bind(this));
-        $("#reset").off("click").click(function(){this.oExercise.loadEditorContent();}.bind(this));
-        $("#easier").off("click").click(function(){
+        //$("#run").on("click").click(function(){this.oExercise.runCode(false);}.bind(this));
+        $("#runtest").on("click").click(function(){this.oExercise.runCode(true);}.bind(this));
+        $("#export").on("click").click(function(){this.oExercise.exportCode(true);}.bind(this));
+        $("#reload").on("click").click(function(){this.oExercise.reloadEditorContent();}.bind(this));
+        $("#reset").on("click").click(function(){this.oExercise.loadEditorContent();}.bind(this));
+        $("#easier").on("click").click(function(){
             this.oExercise.makeEasier(); 
             $("#taskleveltext").html(this.oStudent.getNameForGrade(this.oExercise.iLevel));
         }.bind(this));
         
-        $("#wrapping").off("click").click(function(){
+        $("#wrapping").on("click").click(function(){
                 
             var bOld = editor.getSession().getUseWrapMode();//editor.getWrapBehavioursEnabled();
             editor.getSession().setUseWrapMode(!bOld);
@@ -282,7 +282,7 @@ var ActiveJavascript = function (){
                     //sExtra = "<a href='#"+aExercises[next].folder+"'>Next</a>";
                     var newSearch = "?"+aExercises[next].folder;
                     $("#next").attr("href", newSearch);
-                    $("#next").off("click").click(function(){
+                    $("#next").on("click").click(function(){
                          setExercise(next, true);
                     }).show();
                     
@@ -337,7 +337,7 @@ var ActiveJavascript = function (){
     });
 
     var listitems = $("#exercise_list li a");
-    listitems.off("click").click(function(){
+    listitems.on("click").click(function(){
         var parts = this.href.split("?");
         var iNew = findExercise(parts[1]);
         setExercise(iNew);
