@@ -32,6 +32,7 @@ function FindNextPossibleSetting(StartSetting, CypherText) {
             return Setting; //Found a match, send the Setting back to process
         }
               // Not found so increase Setting by 1
+        Setting ++;
     }
     return false; //If we got all the way to the end of the possible Setting send back false;
 }

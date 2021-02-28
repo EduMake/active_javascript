@@ -65,23 +65,32 @@ h1 {
     font-weight: bold;
     width: 40%;
 }
-.pass:before {
-    color: blue;
+
+tr.pass {
+    background-color: lightgreen;
+}
+tr.fail{
+    background-color: #FF0000BB;
+}
+
+
+li.pass:before {
+    color: green;
     content: "PASS: ";
     font-weight: bold;
 }
-.fail:before {
+li.fail:before {
     color: red;
     content: "FAIL: ";
     font-weight: bold;
 }
 
-.error:before {
+li.error:before {
     color: red;
     content: "ERROR: CODE NOT RUN: ";
     font-weight: bold;
 }
-.warning:before {
+li.warning:before {
     color: orange;
     content: "WARNING: ";
     font-weight: bold;
