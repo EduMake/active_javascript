@@ -50,6 +50,7 @@ var Exercise = function (aData, sExercise){
     this.resetGUI =function () {
         $("#output").html("");
         $("#testoutput").html("");
+        $("#testtable").html("");
         $("#result").html("");
         $("#simulation").html(this.aData.simulation); 
         $("title").text("Active Javascript : " + this.aData.info.name);

@@ -55,6 +55,31 @@ var Executer = function (sTestScript, sContextScript){
         
         if(this.bTest) {
             script += "var assert = function(outcome, description, type ) {aTests.push({text:description,type:type,label:outcome?'Pass':'Fail',pass:outcome, row: false, col: false});};";
+            script += "var GCSEtest = function(options){";
+            script += "var actual = options.func.apply(null, options.inputs);";
+            script += "var outcome = (actual == options.expected);";
+            script += "var result = new Object(options);";
+            script += "result.actual = actual;";
+            script += "result.label = outcome?'Pass':'Fail';";
+            script += "result.pass = outcome;";
+            script += "result.row = false; ";
+            script += "result.col = false;";
+            script += "aTests.push(result);";
+            script += "};";
+            /*
+            var GCSEtest = function(options){
+                var actual = options.func.apply(null, options.inputs);
+                var outcome = (actual == options.expected);
+                var result = new Object(options);
+                result.actual = actual;
+                result.label = outcome?'Pass':'Fail';
+                result.pass = outcome;
+                result.row = false; 
+                result.col = false;
+                aTests.push(result);
+            };
+            */
+
         }
         script +=  this.sContextScript.replace("//CODE//", this.sCode);
         
@@ -63,6 +88,25 @@ var Executer = function (sTestScript, sContextScript){
             script = script.replace("//TESTS//", this.sTestScript);
         }
         script += "\n\nreturn aTests;";
+        return script;
+            
+    };
+    
+    
+    this.getExecutionPython = function() {
+        var script = "aTests = [];";
+        
+        if(this.bTest) {
+            script += "def assert(outcome, description, type ) {aTests.push({text:description,type:type,label:outcome?'Pass':'Fail',pass:outcome, row: false, col: false});};";
+            
+        }
+        script +=  this.sContextScript.replace("##CODE##", this.sCode);
+        
+        if(this.bTest) {
+            // TODO : if()//TESTS// not in script add it at end
+            script = script.replace("##TESTS##", this.sTestScript);
+        }
+        script += "\n\nreturn aTests";
         return script;
             
     };
@@ -109,22 +153,59 @@ var Executer = function (sTestScript, sContextScript){
     
     this.resultsToHTML = function(){
         if(this.aTests.length) {
+            $("#testtable").html("<tr><th>Test</th><th>Function</th><th>Input Type</th><th>Inputs</th><th>Expected</th><th>Actual</th><th>Outcome</th></tr>");
             this.aTests.forEach(function(oMess, iKey) {
-                var li = document.createElement('li');
-                li.className = oMess.label.toLowerCase();
-                
-                var sText = oMess.text;
-                
-                if(oMess.row !== false) {
-                    $(li).click(function(){
-                      editor.gotoLine(oMess.row + 1);
-                    });
-                    sText = "Line "+(oMess.row+1)+" : "+sText;
-                }
-                
-                li.appendChild( document.createTextNode( sText  ) ); 
-                var eOut = $("#testoutput");
-                eOut.append(li);
+                if(oMess.input_type){
+                    var tr = document.createElement('tr');
+                    tr.className = oMess.label.toLowerCase();
+                    //var aNum = document.createElement('td');
+                    
+                    var eTest = document.createElement('td');
+                    eTest.appendChild( document.createTextNode( oMess.text ) );
+                    
+                    tr.appendChild(eTest)
+                    var eFunc = document.createElement('td');
+                    eFunc.appendChild( document.createTextNode( oMess.func.name ) );
+                    tr.appendChild(eFunc)
+                    
+                    var eIT = document.createElement('td');
+                    eIT.appendChild( document.createTextNode( oMess.input_type ) );
+                    tr.appendChild(eIT)
+ 
+                    var eInputs = document.createElement('td');
+                    eInputs.appendChild( document.createTextNode( oMess.inputs.join(", ") ) );
+                    tr.appendChild(eInputs)
+ 
+                    var eExpected = document.createElement('td');
+                    eExpected.appendChild( document.createTextNode( oMess.expected ) );
+                    tr.appendChild(eExpected)
+ 
+                    var eActual = document.createElement('td');
+                    eActual.appendChild( document.createTextNode( oMess.actual ) );
+                    tr.appendChild(eActual)
+                    
+                    var eOutcome = document.createElement('td');
+                    eOutcome.appendChild( document.createTextNode( oMess.label ) );
+                    tr.appendChild(eOutcome)
+                    
+                    var eOut = $("#testtable");
+                    eOut.append(tr);
+                }else{
+                    var li = document.createElement('li');
+                    li.className = oMess.label.toLowerCase();
+
+                    var sText = oMess.text;
+
+                    if(oMess.row !== false) {
+                        $(li).click(function(){
+                          editor.gotoLine(oMess.row + 1);
+                        });
+                        sText = "Line "+(oMess.row+1)+" : "+sText;
+                    }
+                    li.appendChild( document.createTextNode( sText  ) ); 
+                    var eOut = $("#testoutput");
+                    eOut.append(li);
+                }                
             });
         }
     };
