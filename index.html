@@ -88,6 +88,12 @@
         <script src="external/jquery-1.11.0.min.js"></script>
         <link rel="stylesheet" href="external/jquery-modal/jquery.modal.css" type="text/css" media="screen" />
 
+        <script type="text/javascript">
+            // set the pyodide files URL (packages.json, pyodide.asm.data etc)
+            window.languagePluginUrl = 'https://cdn.jsdelivr.net/pyodide/v0.16.1/full/';
+        </script>
+        <script src="https://cdn.jsdelivr.net/pyodide/v0.16.1/full/pyodide.js"></script>
+
         <script src="external/jquery-modal/jquery.modal.js" type="text/javascript" charset="utf-8"></script>
         <script src="external/TinCanJS/build/tincan-min.js"></script>
         
@@ -99,7 +105,10 @@
         
         <script src="js/student.js" charset="utf-8"></script>
         <script src="js/exercise.js" charset="utf-8"></script>
+        
+        <script src="js/exercise_python.js" charset="utf-8"></script>
         <script src="js/executer.js" charset="utf-8"></script>
+            <script src="js/executer_python.js" charset="utf-8"></script>
         
         <script src="js/tincanfactory.js" charset="utf-8"></script>
         <script src="js/active_javascript.js" charset="utf-8"></script>

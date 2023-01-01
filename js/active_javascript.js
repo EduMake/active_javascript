@@ -95,6 +95,10 @@ var ActiveJavascript = function (){
             
         var thisEx = this.aExercises[this.sExercise];
         
+        if (thisEx.info.language == "python3"){
+            this.oExercise = new ExercisePython(thisEx, this.sExercise);   
+            editor.getSession().setMode("ace/mode/python");
+        }
         this.oExercise = new Exercise(thisEx, this.sExercise);
         this.oExercise.setStudent(this.oStudent);
         

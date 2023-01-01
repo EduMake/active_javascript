@@ -48,6 +48,7 @@ $( document ).ready(function() {
     var runCode = function(currExercise, bTest){
         $("#output").html("");
         $("#testoutput").html("");
+        $("#testtable").html("");
         $("#result").html("");
         window.clearInterval(intervalID);
         

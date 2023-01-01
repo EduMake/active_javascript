@@ -1,0 +1,8 @@
+{
+        "name":"Central Heating",
+        "language": "python3",
+        "tags":["selection", "if", "else"],
+        "default":true,
+        "objects": ["http://utc-sheffield.github.io/tincan_curriculum/OCR_GCSE_Computing_2012/#2-1-7-H"],
+        "towards": []
+}
